@@ -3,11 +3,29 @@ require 'yaml'
 require 'erb'
 
 module Toto
-  TEMPLATES = "lib/templates"
+  TEMPLATES = "templates"
+  PAGES = "#{TEMPLATES}/pages"
+  RESOURCES = "#{TEMPLATES}/resources"
 
   module Template
     def to_html bind = binding
-      ERB.new(File.read("#{TEMPLATES}/#{slug}.html")).result(bind)
+      ERB.new(File.read("#{self.class.template_path}/#{slug}.html")).result(bind)
+    end
+
+    def slug
+      self.class.to_s.split('::').last.downcase
+    end
+
+    def self.included obj
+      obj.extend(Paths)
+    end
+
+    module Paths
+      def template_path= path
+        (class << self; self end).instance_eval do
+          define_method(:template_path) { path }
+        end
+      end
     end
   end
 
@@ -15,9 +33,8 @@ module Toto
   end
 
   class Container
-    def slug
-      self.class.to_s.split('::').last.downcase
-    end
+    include Template
+    self.template_path = PAGES
 
     def render mime = "html"
       case mime
@@ -33,15 +50,15 @@ module Toto
   end
 
   class Layout < Container
-    include Template
     attr_accessor :title
+    self.template_path = TEMPLATES
+
     def initialize
       @title = Dir.pwd
     end
   end
 
   class Home < Container
-    include Template
     include Feed
     attr_reader :articles
 
@@ -56,11 +73,17 @@ module Toto
   end
 
   class Resource
+    include Template
     attr_reader :data
+    self.template_path = RESOURCES
 
     def initialize data = {}
       # Serialize keys
       @data = data.inject({}) {|h, (k,v)| h.merge(k.to_sym => v) }
+    end
+
+    def to_s
+      to_html
     end
 
     def method_missing m, *args, &blk
