@@ -12,9 +12,9 @@ There is no toto client, at least for now; everything goes through git.
 synopsis
 --------
 
-One would start by forking or cloning the toto-template repo, to get a basic skeleton:
+One would start by forking or cloning the toto-skeleton repo, to get a basic skeleton:
 
-    $ git clone git://github.com/cloudhead/toto-template.git
+    $ git clone git://github.com/cloudhead/toto-skeleton.git
 
 One would then edit the template at will, it has the following structure:
 
