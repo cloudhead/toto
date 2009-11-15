@@ -202,11 +202,12 @@ module Toto
       @request  = Rack::Request.new env
       @response = Rack::Response.new
 
-      method = @request.request_method.to_sym
+      return [400, {}, []] unless @request.get?
+
       path, mime = @request.path_info.split('.')
       page, key  = path.split('/').reject {|i| i.empty? }
 
-      response = Toto::Site.new(@config).go(page, method, *mime)
+      response = Toto::Site.new(@config).go(page, *mime)
 
       @response.body = [response[:body]]
       @response['Content-Length'] = response[:body].length.to_s
