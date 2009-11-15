@@ -115,10 +115,17 @@ module Toto
   class Article < Hash
     include Template
 
-    def initialize str, config = {}
+    def initialize obj, config = {}
       @config = config
-      meta, self[:body] = str.split(/\n\n/, 2)
-      self.update YAML.load(meta).inject({}) {|h, (k,v)| h.merge(k.to_sym => v) }
+
+      data = if obj.is_a? String
+        meta, self[:body] = obj.split(/\n\n/, 2)
+        YAML.load(meta)
+      elsif obj.is_a? Hash
+        obj
+      end.inject({}) {|h, (k,v)| h.merge(k.to_sym => v) }
+
+      self.update data
       self[:date] = Time.parse(self[:date]) rescue Time.now
     end
 
