@@ -19,5 +19,9 @@ module Riot
       (doc/expected.first).inner_html.match(expected.last) ||
         fail("expected #{actual} to include a <#{expected.first}> element with #{expected.last} inside")
     end
+
+    def within(expected)
+      expected.include?(actual) || fail("expected #{actual} to be within #{expected}")
+    end
   end
 end
