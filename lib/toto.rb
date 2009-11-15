@@ -58,18 +58,13 @@ module Toto
       self[:root]
     end
 
-    def go route, method, type = "html"
+    def go route, type = :html
       route ||= self./
+      route, type = route.to_sym, type.to_sym
 
-      body, status = if respond_to?(:"to_#{type}") && method == :GET
+      body, status = if Context.new.respond_to?(:"to_#{type}")
         if respond_to?(route)
-          render = Proc.new do
-            send(route.to_sym, type.to_sym).each {|k,v| meta_def(k) { v } }
-            self.to_html(route)
-          end
-
-          [type == "html" ? send(:to_html, :layout, binding, &render)
-                          : send(:"to_#{type}", self.index(type.to_sym)), 200]
+          [Context.new(send(route, type), @config).render(route, type), 200]
         else
           http 401
         end
@@ -80,12 +75,6 @@ module Toto
       return :body => body, :type => type, :status => status
     end
 
-    def to_xml articles
-      xml = Builder::XmlMarkup.new(:indent => 2)
-      instance_eval File.read("#{Paths[:templates]}/feed.builder")
-    end
-    alias :to_atom to_xml
-
   protected
 
     def http code
@@ -94,6 +83,32 @@ module Toto
 
     def articles
       Dir["#{Paths[:articles]}/*.txt"]
+    end
+
+    class Context
+      include Template
+
+      def initialize ctx = {}, config = {}
+        @config = config
+
+        ctx.each do |k, v|
+          if v.is_a? Proc
+            meta_def(k, &v)
+          else
+            meta_def(k) { v }
+          end
+        end
+      end
+
+      def render page, type
+        type == :html ? to_html(:layout, &Proc.new { to_html page }) : send(:"to_#{type}", :feed)
+      end
+
+      def to_xml page
+        xml = Builder::XmlMarkup.new(:indent => 2)
+        instance_eval File.read("#{Paths[:templates]}/#{page}.builder")
+      end
+      alias :to_atom to_xml
     end
   end
 
