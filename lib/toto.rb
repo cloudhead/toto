@@ -2,7 +2,6 @@ require 'yaml'
 require 'time'
 require 'erb'
 require 'rack'
-require 'ostruct'
 
 require 'rdiscount'
 require 'builder'
@@ -16,14 +15,12 @@ module Toto
   }
 
   module Template
-    def to_html page, bind = binding, &blk
+    def to_html page, &blk
       ERB.new(File.read("#{Paths[:pages]}/#{page}.rhtml")).result(binding)
     end
   end
 
   class Site
-    include Template
-
     def initialize config
       @config = config
       @title = self[:title]
@@ -37,22 +34,22 @@ module Toto
       @config.set key, value
     end
 
-    def index type
+    def index type = :html
       case type
         when :html
           return :articles => self.articles.reverse[0...self[:paginate]].map do |article|
             Article.new File.read(article), @config
           end
         when :xml, :json
-          return self.articles.map do |article|
+          return :articles => self.articles.map do |article|
             Article.new File.read(article), @config
           end
         else return {}
       end
     end
 
-    def archive
-      return :archive => self.articles.reverse[self[:paginate]..-1].map do |article|
+    def archives count = self[:paginate]
+      return :archives => self.articles.reverse[count..-1].map do |article|
         Article.new File.read(article), @config
       end
     end
@@ -116,7 +113,7 @@ module Toto
     end
 
     def summary length = @config[:summary]
-      markdown self[:body].match(/(.{#{length}}.*?)(\n|\Z)/m) || self[:body]
+      markdown self[:body].match(/(.{1,#{length}}.*?)(\n|\Z)/m).to_s
     end
 
     def body()    markdown self[:body]                       end
@@ -136,7 +133,7 @@ module Toto
 
     def markdown text
       if (markdown = @config[:markdown])
-        Markdown.new(text.strip, *(markdown unless markdown.eql?(true))).to_html
+        Markdown.new(text.to_s.strip, *(markdown unless markdown.eql?(true))).to_html
       else
         text.strip
       end
@@ -164,9 +161,6 @@ module Toto
       self.update obj
     end
 
-    def []= key, val
-      super
-    end
     alias set :[]=
 
     def [] key, *args
@@ -179,7 +173,7 @@ module Toto
     attr_reader :config
 
     def initialize config = {}
-      @config = Config.new(config)
+      @config = config.is_a?(Config) ? config : Config.new(config)
     end
 
     def call env
@@ -188,13 +182,13 @@ module Toto
 
       method = @request.request_method.to_sym
       path, mime = @request.path_info.split('.')
-      page, key = path.split('/').reject {|i| i.empty? }
+      page, key  = path.split('/').reject {|i| i.empty? }
 
       response = Toto::Site.new(@config).go(page, method, *mime)
 
       @response.body = [response[:body]]
       @response['Content-Length'] = response[:body].length.to_s
-      @response['Content-Type'  ] = Rack::Mime.mime_type(".#{response[:type]}")
+      @response['Content-Type']   = Rack::Mime.mime_type(".#{response[:type]}")
       @response.status = response[:status]
       @response.finish
     end
