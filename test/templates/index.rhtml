@@ -1,6 +1,9 @@
 <ul id="articles">
-  <% for article in articles %>
+  <% for article in articles[0...3] %>
     <li><%= article %></li>
   <% end %>
 </ul>
+<div id="archives">
+  <%= archives[3...5] %>
+</div>
 

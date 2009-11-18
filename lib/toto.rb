@@ -18,6 +18,12 @@ module Toto
     def to_html page, &blk
       ERB.new(File.read("#{Paths[:pages]}/#{page}.rhtml")).result(binding)
     end
+
+    def self.included obj
+      obj.class_eval do
+        define_method(obj.to_s.split('::').last.downcase) { self }
+      end
+    end
   end
 
   class Site
@@ -37,9 +43,9 @@ module Toto
     def index type = :html
       case type
         when :html
-          return :articles => self.articles.reverse[0...self[:paginate]].map do |article|
-            Article.new File.read(article), @config
-          end
+          {:articles => self.articles.reverse.map do |article|
+              Article.new File.read(article), @config
+          end }.merge archives
         when :xml, :json
           return :articles => self.articles.map do |article|
             Article.new File.read(article), @config
@@ -48,9 +54,22 @@ module Toto
       end
     end
 
-    def archives count = self[:paginate]
-      return :archives => self.articles.reverse[count..-1].map do |article|
-        Article.new File.read(article), @config
+    def archives filter = //
+      entries = ! self.articles.empty??
+        self.articles.select do |a|
+          File.basename(a) =~ /^#{filter}/
+        end.reverse.map do |article|
+          Article.new File.read(article), @config
+        end : []
+
+      return :archives => Archives.new(entries)
+    end
+
+    def article route
+      begin
+        Article.new File.read("#{Paths[:articles]}/#{route.join('-')}.#{self[:ext]}")
+      rescue Errno::ENOENT
+        http 401
       end
     end
 
@@ -59,11 +78,19 @@ module Toto
     end
 
     def go route, type = :html
-      route ||= self./
-      route, type = route.to_sym, type.to_sym
+      route << self./ if route.empty?
+      type = type.to_sym
 
       body, status = if Context.new.respond_to?(:"to_#{type}")
-        if respond_to?(route)
+        if route.first =~ /\d{4}/
+          case route.size
+            when 1..3
+              [Context.new(archives(route * '-'), @config).render(:archives, type), 200]
+            when 4
+              [Context.new(article(route), @config).render(:article, type), 200]
+            else http 400
+          end
+        elsif respond_to?(route = route.first.to_sym)
           [Context.new(send(route, type), @config).render(route, type), 200]
         else
           http 401
@@ -82,7 +109,7 @@ module Toto
     end
 
     def articles
-      Dir["#{Paths[:articles]}/*.txt"]
+      Dir["#{Paths[:articles]}/*.#{self[:ext]}"]
     end
 
     class Context
@@ -90,14 +117,7 @@ module Toto
 
       def initialize ctx = {}, config = {}
         @config = config
-
-        ctx.each do |k, v|
-          if v.is_a? Proc
-            meta_def(k, &v)
-          else
-            meta_def(k) { v }
-          end
-        end
+        ctx.each {|k, v| meta_def(k) { v } }
       end
 
       def render page, type
@@ -110,6 +130,20 @@ module Toto
       end
       alias :to_atom to_xml
     end
+  end
+
+  class Archives < Array
+    include Template
+
+    def initialize articles
+      self.replace articles
+    end
+
+    def to_html
+      super(:archives)
+    end
+    alias :to_s to_html
+    alias :archive archives
   end
 
   class Article < Hash
@@ -171,7 +205,7 @@ module Toto
       :markdown => :smart,                                # use markdown
       :disqus => false,                                   # disqus name
       :summary => 150,                                    # length of summary
-      :paginate => 10                                     # number of articles in index
+      :ext => 'txt'                                       # extension for articles
     }
     def initialize obj
       self.update Defaults
@@ -194,8 +228,9 @@ module Toto
   class Server
     attr_reader :config
 
-    def initialize config = {}
+    def initialize config = {}, &blk
       @config = config.is_a?(Config) ? config : Config.new(config)
+      @config.instance_eval(&blk) if block_given?
     end
 
     def call env
@@ -205,9 +240,9 @@ module Toto
       return [400, {}, []] unless @request.get?
 
       path, mime = @request.path_info.split('.')
-      page, key  = path.split('/').reject {|i| i.empty? }
+      route = path.split('/').reject {|i| i.empty? }
 
-      response = Toto::Site.new(@config).go(page, *mime)
+      response = Toto::Site.new(@config).go(route, *mime)
 
       @response.body = [response[:body]]
       @response['Content-Length'] = response[:body].length.to_s

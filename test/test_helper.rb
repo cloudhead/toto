@@ -13,11 +13,15 @@ module Riot
     end
 
     def includes_html(expected)
-      doc = Hpricot(actual)
+      doc = Hpricot.parse(actual)
       expected = expected.flatten
       !(doc/expected.first).empty? || fail("expected #{actual} to contain a <#{expected.first}>")
-      (doc/expected.first).inner_html.match(expected.last) ||
-        fail("expected #{actual} to include a <#{expected.first}> element with #{expected.last} inside")
+      (doc/expected.first).inner_html.match(expected.last) || fail("expected <#{expected.first}> to contain #{expected.last}")
+    end
+
+    def includes_elements(selector, count)
+      doc = Hpricot.parse(actual)
+      (doc/selector).size == count || fail("expected #{actual} to contain #{count} #{selector}(s)")
     end
 
     def within(expected)
