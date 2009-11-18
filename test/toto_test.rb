@@ -5,7 +5,7 @@ AUTHOR = "toto"
 
 context Toto do
   setup do
-    @config = Toto::Config.new({:author => AUTHOR, :url => URL})
+    @config = Toto::Config.new(:author => AUTHOR, :url => URL)
     @toto = Rack::MockRequest.new(Toto::Server.new(@config))
     Toto::Paths[:articles] = "test/articles"
     Toto::Paths[:pages] = "test/templates"
@@ -18,7 +18,40 @@ context Toto do
     asserts("returns a 200")                { topic.status }.equals 200
     asserts("body is not empty")            { not topic.body.empty? }
     asserts("content type is set properly") { topic.content_type }.equals "text/html"
-    should("include an article")            { topic.body }.includes_html("#articles" => /Once upon a time/)
+    should("include a couple of article")   { topic.body }.includes_elements("#articles li", 3)
+    should("include an archive")            { topic.body }.includes_elements("#archives li", 2)
+
+    context "with no articles" do
+      setup { Rack::MockRequest.new(Toto::Server.new(@config.merge(:ext => 'oxo'))).get('/') }
+
+      asserts("body is not empty")          { not topic.body.empty? }
+      asserts("returns a 200")              { topic.status }.equals 200
+    end
+  end
+
+  context "GET a single article" do
+    setup { @toto.get("/1900/05/17/the-wonderful-wizard-of-oz") }
+    asserts("returns a 200")                { topic.status }.equals 200
+    asserts("content type is set properly") { topic.content_type }.equals "text/html"
+    should("contain the article")           { topic.body }.includes_html("p" => /Once upon a time/)
+  end
+
+  context "GET to the archive" do
+    context "through a year" do
+      setup { @toto.get('/2009') }
+      asserts("returns a 200")                     { topic.status }.equals 200
+      should("includes the entries for that year") { topic.body }.includes_elements("li.entry", 3)
+    end
+
+    context "through a year & month" do
+      setup { @toto.get('/2009/12') }
+      asserts("returns a 200")                      { topic.status }.equals 200
+      should("includes the entries for that month") { topic.body }.includes_elements("li.entry", 2)
+    end
+
+    context "through /archive" do
+      setup { @toto.get('/archive') }
+    end
   end
 
   context "GET to an unknown route" do
