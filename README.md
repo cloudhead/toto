@@ -6,7 +6,7 @@ the tiniest blogging engine in Oz!
 introduction
 ------------
 
-toto is a git-powered, minimalist blog engine for the hackers of Oz.
+toto is a git-powered, minimalist blog engine for the hackers of Oz. The engine weights around ~200 sloc at its worse.
 There is no toto client, at least for now; everything goes through git.
 
 synopsis
@@ -20,13 +20,17 @@ One would then edit the template at will, it has the following structure:
 
     templates/
     |
-    +- layout.html   # the main site layout, shared by all pages
+    +- layout.rhtml      # the main site layout, shared by all pages
     |
-    +- article.html  # the article (post) partial
+    +- feed.builder      # the builder template for the atom feed
     |
-    +- pages/        # pages, such as home, about, etc go here
+    +- pages/            # pages, such as home, about, etc go here
        |
-       +- home.html  # the default page loaded from `/`, it displays the list of articles
+       +- home.rhtml     # the default page loaded from `/`, it displays the list of articles
+       |
+       +- article.rhtml  # the article (post) partial and page
+       |
+       +- about.rhtml
 
 One could then create a .txt article file in the `articles/` folder, and make sure it has the following format:
 
@@ -37,8 +41,10 @@ One could then create a .txt article file in the `articles/` folder, and make su
     Dorothy lived in the midst of the great Kansas prairies, with Uncle Henry, 
     who was a farmer, and Aunt Em, who was the farmer's wife.
   
-If one is familiar with webby or aerial, this shouldn't look funny. Basically the top of the file is in YAML format, and the rest of it is the blog post.
-They are delimited by an empty line `/\n\n/`, as you can see above. None of the information is compulsory, but it's strongly encouraged you specify it.
+If one is familiar with webby or aerial, this shouldn't look funny. Basically the top of the file is in YAML format,
+and the rest of it is the blog post.They are delimited by an empty line `/\n\n/`, as you can see above. 
+None of the information is compulsory, but it's strongly encouraged you specify it.
+Note that one can also use `rake` to create an article stub, with `rake new`.
 
 Once he finishes writing his beautiful tale, one can push to the git repo, as usual:
 
@@ -50,6 +56,6 @@ Where `remote` is the name of your remote git server.
 
 ### Server ###
 
-info coming soon!
+For the server, there is one important file: _server.ru_ 
 
 Copyright (c) 2009 cloudhead. See LICENSE for details.
