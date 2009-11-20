@@ -9,14 +9,15 @@ require 'ext'
 
 module Toto
   Paths = {
-    :config => "config/config.rb",
     :templates => "templates",
-    :pages => "templates/pages"
+    :pages => "templates/pages",
+    :articles => "articles"
   }
 
   module Template
     def to_html page, &blk
-      ERB.new(File.read("#{Paths[:pages]}/#{page}.rhtml")).result(binding)
+      path = (page == :layout ? Paths[:templates] : Paths[:pages])
+      ERB.new(File.read("#{path}/#{page}.rhtml")).result(binding)
     end
 
     def self.included obj
@@ -29,7 +30,6 @@ module Toto
   class Site
     def initialize config
       @config = config
-      @title = self[:title]
     end
 
     def [] *args
@@ -118,6 +118,10 @@ module Toto
       def initialize ctx = {}, config = {}
         @config = config
         ctx.each {|k, v| meta_def(k) { v } }
+      end
+
+      def title
+        @config[:title]
       end
 
       def render page, type
@@ -209,11 +213,6 @@ module Toto
     }
     def initialize obj
       self.update Defaults
-
-      if File.exist?(Paths[:config])
-        instance_eval { load Paths[:config] }
-      end
-
       self.update obj
     end
 

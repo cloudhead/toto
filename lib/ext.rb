@@ -7,20 +7,19 @@ class Object
 end
 
 class Fixnum
-  def ordinal number
+  def ordinal
     # 1 => 1st
     # 2 => 2nd
     # 3 => 3rd
     # ...
-    number = number.to_i
-    case number % 100
-      when 11..13; "#{number}th"
+    case self % 100
+      when 11..13; "#{self}th"
     else
-      case number % 10
-        when 1; "#{number}st"
-        when 2; "#{number}nd"
-        when 3; "#{number}rd"
-        else    "#{number}th"
+      case self % 10
+        when 1; "#{self}st"
+        when 2; "#{self}nd"
+        when 3; "#{self}rd"
+        else    "#{self}th"
       end
     end
   end
