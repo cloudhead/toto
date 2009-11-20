@@ -246,6 +246,11 @@ module Toto
       @response.body = [response[:body]]
       @response['Content-Length'] = response[:body].length.to_s
       @response['Content-Type']   = Rack::Mime.mime_type(".#{response[:type]}")
+
+      # Cache for one day
+      @response['Cache-Control'] = "public, max-age=86400"
+      @response['Etag'] = Digest::SHA1.hexdigest(response[:body])
+
       @response.status = response[:status]
       @response.finish
     end
