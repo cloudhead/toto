@@ -2,6 +2,7 @@ require 'yaml'
 require 'time'
 require 'erb'
 require 'rack'
+require 'digest'
 
 require 'rdiscount'
 require 'builder'
@@ -44,11 +45,11 @@ module Toto
       case type
         when :html
           {:articles => self.articles.reverse.map do |article|
-              Article.new File.read(article), @config
+              Article.new File.new(article), @config
           end }.merge archives
         when :xml, :json
           return :articles => self.articles.map do |article|
-            Article.new File.read(article), @config
+            Article.new File.new(article), @config
           end
         else return {}
       end
@@ -59,7 +60,7 @@ module Toto
         self.articles.select do |a|
           File.basename(a) =~ /^#{filter}/
         end.reverse.map do |article|
-          Article.new File.read(article), @config
+          Article.new File.new(article), @config
         end : []
 
       return :archives => Archives.new(entries)
@@ -67,7 +68,7 @@ module Toto
 
     def article route
       begin
-        Article.new File.read("#{Paths[:articles]}/#{route.join('-')}.#{self[:ext]}")
+        Article.new(File.new("#{Paths[:articles]}/#{route.join('-')}.#{self[:ext]}")).load
       rescue Errno::ENOENT
         http 401
       end
@@ -154,18 +155,28 @@ module Toto
     include Template
 
     def initialize obj, config = {}
-      @config = config
+      @obj, @config = obj, config
+    end
 
-      data = if obj.is_a? String
-        meta, self[:body] = obj.split(/\n\n/, 2)
+    def load
+      data = if @obj.is_a? File
+        meta, self[:body] = @obj.read.split(/\n\n/, 2)
         YAML.load(meta)
-      elsif obj.is_a? Hash
-        obj
+      elsif @obj.is_a? Hash
+        @obj
       end.inject({}) {|h, (k,v)| h.merge(k.to_sym => v) }
 
+      self.taint
       self.update data
       self[:date] = Time.parse(self[:date]) rescue Time.now
+      self
     end
+
+    def [] key
+      self.load unless self.tainted?
+      super
+    end
+
 
     def slug
       self[:slug] ||
@@ -176,12 +187,13 @@ module Toto
       markdown self[:body].match(/(.{1,#{length}}.*?)(\n|\Z)/m).to_s
     end
 
+    def title()   self[:title] || "an article"               end
     def body()    markdown self[:body]                       end
     def url()     @config[:url] + self.path                  end
     def date()    @config[:date, self[:date]]                end
     def path()    self[:date].strftime("/%Y/%m/%d/#{slug}/") end
     def author()  self[:author] || @config[:author]          end
-    def to_html() super(:article)                            end
+    def to_html() self.load; super(:article)                 end
 
     alias :to_s to_html
 
