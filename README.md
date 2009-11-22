@@ -7,7 +7,7 @@ introduction
 ------------
 
 toto is a git-powered, minimalist blog engine for the hackers of Oz. The engine weights around ~200 sloc at its worse.
-There is no toto client, at least for now; everything goes through git. The implications are:
+There is no toto client, at least for now; everything goes through git.
 
 philosophy
 ----------
