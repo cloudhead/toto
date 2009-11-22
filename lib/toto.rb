@@ -188,9 +188,12 @@ module Toto
       markdown self[:body].match(/(.{1,#{length}}.*?)(\n|\Z)/m).to_s
     end
 
+    def url
+      "http://#{(@config[:url].sub("http://", '') + self.path).squeeze('/')}"
+    end
+
     def title()   self[:title] || "an article"               end
     def body()    markdown self[:body]                       end
-    def url()     @config[:url] + self.path                  end
     def date()    @config[:date, self[:date]]                end
     def path()    self[:date].strftime("/%Y/%m/%d/#{slug}/") end
     def author()  self[:author] || @config[:author]          end
@@ -218,6 +221,7 @@ module Toto
       :author => ENV['USER'],                             # blog author
       :title => Dir.pwd.split('/').last,                  # site title
       :root => "index",                                   # site index
+      :url => "http://127.0.0.1",
       :date => lambda {|now| now.strftime("%d/%m/%Y") },  # date function
       :markdown => :smart,                                # use markdown
       :disqus => false,                                   # disqus name
