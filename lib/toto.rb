@@ -67,11 +67,7 @@ module Toto
     end
 
     def article route
-      begin
-        Article.new(File.new("#{Paths[:articles]}/#{route.join('-')}.#{self[:ext]}")).load
-      rescue Errno::ENOENT
-        http 401
-      end
+      Article.new(File.new("#{Paths[:articles]}/#{route.join('-')}.#{self[:ext]}")).load
     end
 
     def /
@@ -84,12 +80,17 @@ module Toto
 
       body, status = if Context.new.respond_to?(:"to_#{type}")
         if route.first =~ /\d{4}/
-          case route.size
-            when 1..3
-              [Context.new(archives(route * '-'), @config).render(:archives, type), 200]
-            when 4
-              [Context.new(article(route), @config).render(:article, type), 200]
-            else http 400
+          begin
+            case route.size
+              when 1..3
+                [Context.new(archives(route * '-'), @config).render(:archives, type), 200]
+              when 4
+                [Context.new(article(route), @config).render(:article, type), 200]
+              else http 400
+            end
+          rescue Errno::ENOENT => e
+            $stderr.puts e
+            http 401
           end
         elsif respond_to?(route = route.first.to_sym)
           [Context.new(send(route, type), @config).render(route, type), 200]
