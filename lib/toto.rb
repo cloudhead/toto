@@ -107,7 +107,7 @@ module Toto
   protected
 
     def http code
-      return ["HTTP #{code}", code]
+      return ["<font style='font-size:300%'>toto, we're not in Kansas anymore (#{code})</font>", code]
     end
 
     def articles
