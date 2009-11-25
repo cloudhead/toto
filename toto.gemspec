@@ -37,7 +37,8 @@ Gem::Specification.new do |s|
      "test/templates/index.rhtml",
      "test/templates/layout.rhtml",
      "test/test_helper.rb",
-     "test/toto_test.rb"
+     "test/toto_test.rb",
+     "toto.gemspec"
   ]
   s.homepage = %q{http://github.com/cloudhead/toto}
   s.rdoc_options = ["--charset=UTF-8"]
@@ -55,12 +56,21 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
-      s.add_development_dependency(%q<minitest>, [">= 0"])
+      s.add_development_dependency(%q<riot>, [">= 0"])
+      s.add_runtime_dependency(%q<builder>, [">= 0"])
+      s.add_runtime_dependency(%q<rack>, [">= 0"])
+      s.add_runtime_dependency(%q<rdiscount>, [">= 0"])
     else
-      s.add_dependency(%q<minitest>, [">= 0"])
+      s.add_dependency(%q<riot>, [">= 0"])
+      s.add_dependency(%q<builder>, [">= 0"])
+      s.add_dependency(%q<rack>, [">= 0"])
+      s.add_dependency(%q<rdiscount>, [">= 0"])
     end
   else
-    s.add_dependency(%q<minitest>, [">= 0"])
+    s.add_dependency(%q<riot>, [">= 0"])
+    s.add_dependency(%q<builder>, [">= 0"])
+    s.add_dependency(%q<rack>, [">= 0"])
+    s.add_dependency(%q<rdiscount>, [">= 0"])
   end
 end
 
