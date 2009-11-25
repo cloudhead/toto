@@ -170,7 +170,7 @@ module Toto
 
       self.taint
       self.update data
-      self[:date] = Time.parse(self[:date]) rescue Time.now
+      self[:date] = Time.parse(self[:date].gsub('/', '-')) rescue Time.now
       self
     end
 
@@ -209,8 +209,8 @@ module Toto
   private
 
     def markdown text
-      if (markdown = @config[:markdown])
-        Markdown.new(text.to_s.strip, *(markdown unless markdown.eql?(true))).to_html
+      if (options = @config[:markdown])
+        Markdown.new(text.to_s.strip, *(options.eql?(true) ? [] : options)).to_html
       else
         text.strip
       end
@@ -259,7 +259,7 @@ module Toto
       path, mime = @request.path_info.split('.')
       route = path.split('/').reject {|i| i.empty? }
 
-      response = Toto::Site.new(@config).go(route, *mime)
+      response = Toto::Site.new(@config).go(route, *(mime ? mime : []))
 
       @response.body = [response[:body]]
       @response['Content-Length'] = response[:body].length.to_s

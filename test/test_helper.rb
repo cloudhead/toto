@@ -1,5 +1,6 @@
-require 'riot'
+require 'rubygems'
 require 'hpricot'
+require 'riot'
 
 $:.unshift File.dirname(__FILE__)
 $:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
@@ -14,7 +15,7 @@ module Riot
 
     def includes_html(expected)
       doc = Hpricot.parse(actual)
-      expected = expected.flatten
+      expected = expected.to_a.flatten
       !(doc/expected.first).empty? || fail("expected #{actual} to contain a <#{expected.first}>")
       (doc/expected.first).inner_html.match(expected.last) || fail("expected <#{expected.first}> to contain #{expected.last}")
     end
