@@ -121,7 +121,7 @@ context Toto do
           Toto::Article.new({:body => "there ain't such thing as a free lunch\n" * 10}, @config)
         end
 
-        should("create a valid summary") { topic.summary.size }.within (75..80)
+        should("create a valid summary") { topic.summary.size }.within 75..80
       end
     end
   end
