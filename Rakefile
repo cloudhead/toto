@@ -10,7 +10,10 @@ begin
     gem.email = "self@cloudhead.net"
     gem.homepage = "http://github.com/cloudhead/toto"
     gem.authors = ["cloudhead"]
-    gem.add_development_dependency "minitest"
+    gem.add_development_dependency "riot"
+    gem.add_dependency "builder"
+    gem.add_dependency "rack"
+    gem.add_dependency "rdiscount"
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
