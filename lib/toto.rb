@@ -157,6 +157,7 @@ module Toto
 
     def initialize obj, config = {}
       @obj, @config = obj, config
+      self.load if obj.is_a? Hash
     end
 
     def load
