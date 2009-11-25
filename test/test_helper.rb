@@ -8,24 +8,24 @@ $:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
 require 'toto'
 
 module Riot
-  module AssertionMacros
-    def includes(expected)
+  class Assertion
+    assertion(:includes) do |actual, expected|
       actual.include?(expected) || fail("expected #{actual} to include #{expected}")
     end
 
-    def includes_html(expected)
+    assertion(:includes_html) do |actual, expected|
       doc = Hpricot.parse(actual)
       expected = expected.to_a.flatten
       !(doc/expected.first).empty? || fail("expected #{actual} to contain a <#{expected.first}>")
       (doc/expected.first).inner_html.match(expected.last) || fail("expected <#{expected.first}> to contain #{expected.last}")
     end
 
-    def includes_elements(selector, count)
+    assertion(:includes_elements) do |actual, selector, count|
       doc = Hpricot.parse(actual)
       (doc/selector).size == count || fail("expected #{actual} to contain #{count} #{selector}(s)")
     end
 
-    def within(expected)
+    assertion(:within) do |actual, expected|
       expected.include?(actual) || fail("expected #{actual} to be within #{expected}")
     end
   end
