@@ -19,6 +19,7 @@ how it works
 
 - content is entirely managed trough **git**; you get full fledged version control for free.
 - articles are stored as _.txt_ files, with embeded metadata (in yaml format).
+- articles are processed through a markdown converter (rdiscount) by default.
 - templating is done through **ERB**.
 - toto is built right on top of **Rack**.
 - comments are handled by disqus:(http://disqus.com)
@@ -70,13 +71,14 @@ Once he finishes writing his beautiful tale, one can push to the git repo, as us
 
 Where `remote` is the name of your remote git repository. The article is now published.
 
-### server
+### deployment
 
 Toto is built on top of **Rack**, and hence has a **rackup** file: _config.ru_.
 
-#### on your own
+#### on your own server
 
-You can run toto with any Rack compliant web server, such as **thin**, **mongrel** or **unicorn**.
+Once you have created the remote git repo, and pushed your changes to it, you can run toto with any Rack compliant web server, 
+such as **thin**, **mongrel** or **unicorn**.
 
 With thin, you would do something like:
 
@@ -89,7 +91,8 @@ With unicorn, you can just do:
 #### on heroku
 
 Toto was designed to work well with heroku:(http://heroku.com), it makes the most out of it's state-of-the-art caching, 
-by setting the _Cache-Control_ and _Etag_ HTTP headers.
+by setting the _Cache-Control_ and _Etag_ HTTP headers. Deploying on Heroku is really easy, just get the heroku gem, 
+create a heroku app with `heroku create`, and push with `git push heroku master`.
 
 ### configuration
 
