@@ -6,6 +6,9 @@ require 'digest'
 
 require 'rdiscount'
 require 'builder'
+
+$:.unshift File.dirname(__FILE__)
+
 require 'ext'
 
 module Toto
