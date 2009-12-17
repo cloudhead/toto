@@ -74,7 +74,7 @@ context Toto do
   context "creating an article" do
     setup do
       @config[:markdown] = true
-      @config[:date] = lambda {|t| "the time is #{t}" }
+      @config[:date] = lambda {|t| "the time is #{t.strftime("%Y/%m/%d %H:%M")}" }
       @config[:summary] = 50
     end
 
@@ -89,7 +89,7 @@ context Toto do
       should("have a title")               { topic.title }.equals "Toto & The Wizard of Oz."
       should("parse the body as markdown") { topic.body }.equals "<h1>Chapter I</h1>\n\n<p>hello, <em>stranger</em>.</p>\n"
       should("create an appropriate slug") { topic.slug }.equals "toto-and-the-wizard-of-oz"
-      should("set the date")               { topic.date }.equals "the time is #{Time.now}"
+      should("set the date")               { topic.date }.equals "the time is #{Time.now.strftime("%Y/%m/%d %H:%M")}"
       should("create a summary")           { topic.summary == topic.body }
       should("have an author")             { topic.author }.equals AUTHOR
       should("have a path")                { topic.path }.equals Time.now.strftime("/%Y/%m/%d/toto-and-the-wizard-of-oz/")
