@@ -30,8 +30,10 @@ synopsis
 --------
 
 One would start by forking or cloning the toto-skeleton repo, to get a basic skeleton:
-
-    $ git clone git://github.com/cloudhead/toto-skeleton.git
+    
+    $ mkdir weblog/
+    $ cd weblog/
+    $ git clone git://github.com/cloudhead/toto-skeleton.git .
 
 One would then edit the template at will, it has the following structure:
 
@@ -93,6 +95,11 @@ With unicorn, you can just do:
 Toto was designed to work well with heroku:(http://heroku.com), it makes the most out of it's state-of-the-art caching, 
 by setting the _Cache-Control_ and _Etag_ HTTP headers. Deploying on Heroku is really easy, just get the heroku gem, 
 create a heroku app with `heroku create`, and push with `git push heroku master`.
+
+    $ heroku create
+    $ heroku rename weblog
+    $ git push heroku master
+    $ heroku open
 
 ### configuration
 
