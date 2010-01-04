@@ -7,13 +7,11 @@ $:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
 
 require 'toto'
 
-module Riot
-  class Assertion
-    assertion(:includes) do |actual, expected|
-      actual.include?(expected) ? pass : fail("expected #{actual} to include #{expected}")
-    end
+module Toto
+  class IncludesHTMLMacro < Riot::AssertionMacro
+    register :includes_html
 
-    assertion(:includes_html) do |actual, expected|
+    def evaluate(actual, expected)
       doc = Hpricot.parse(actual)
       expected = expected.to_a.flatten
 
@@ -25,13 +23,21 @@ module Riot
         pass
       end
     end
+  end
 
-    assertion(:includes_elements) do |actual, selector, count|
+  class IncludesElementsMacro < Riot::AssertionMacro
+    register :includes_elements
+
+    def evaluate(actual, selector, count)
       doc = Hpricot.parse(actual)
       (doc/selector).size == count ? pass : fail("expected #{actual} to contain #{count} #{selector}(s)")
     end
+  end
 
-    assertion(:within) do |actual, expected|
+  class WithinMacro < Riot::AssertionMacro
+    register :within
+
+    def evaluate(actual, expected)
       expected.include?(actual) ? pass : fail("expected #{actual} to be within #{expected}")
     end
   end
