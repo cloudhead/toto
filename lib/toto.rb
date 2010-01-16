@@ -93,7 +93,7 @@ module Toto
             end
           rescue Errno::ENOENT => e
             $stderr.puts e
-            http 401
+            http 404
           end
         elsif respond_to?(route = route.first.to_sym)
           [Context.new(send(route, type), @config).render(route, type), 200]
