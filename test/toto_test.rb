@@ -5,7 +5,7 @@ AUTHOR = "toto"
 
 context Toto do
   setup do
-    @config = Toto::Config.new(:author => AUTHOR, :url => URL)
+    @config = Toto::Config.new(:markdown => true, :author => AUTHOR, :url => URL)
     @toto = Rack::MockRequest.new(Toto::Server.new(@config))
     Toto::Paths[:articles] = "test/articles"
     Toto::Paths[:pages] = "test/templates"
@@ -33,7 +33,7 @@ context Toto do
     setup { @toto.get("/1900/05/17/the-wonderful-wizard-of-oz") }
     asserts("returns a 200")                { topic.status }.equals 200
     asserts("content type is set properly") { topic.content_type }.equals "text/html"
-    should("contain the article")           { topic.body }.includes_html("p" => /Once upon a time/)
+    should("contain the article")           { topic.body }.includes_html("p" => /<em>Once upon a time<\/em>/)
   end
 
   context "GET to the archive" do

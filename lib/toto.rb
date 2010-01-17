@@ -121,8 +121,10 @@ module Toto
       include Template
 
       def initialize ctx = {}, config = {}
-        @config = config
-        ctx.each {|k, v| meta_def(k) { v } }
+        @config, @ctx = config, ctx
+        ctx.each do |k, v|
+          meta_def(k) { ctx.instance_of?(Hash) ? v : ctx.send(k) }
+        end
       end
 
       def title
@@ -181,7 +183,6 @@ module Toto
       self.load unless self.tainted?
       super
     end
-
 
     def slug
       self[:slug] ||
