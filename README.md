@@ -22,9 +22,10 @@ how it works
 - articles are processed through a markdown converter (rdiscount) by default.
 - templating is done through **ERB**.
 - toto is built right on top of **Rack**.
-- comments are handled by disqus:(http://disqus.com)
+- comments are handled by [disqus](http://disqus.com)
 - individual articles can be accessed through urls such as _/2009/11/21/blogging-with-toto_
 - the archives can be accessed by year, month or day, wih the same format as above.
+- arbitrary metadata can be included in articles files, and accessed from the templates.
 
 synopsis
 --------
@@ -92,7 +93,7 @@ With unicorn, you can just do:
 
 #### on heroku
 
-Toto was designed to work well with heroku:(http://heroku.com), it makes the most out of it's state-of-the-art caching, 
+Toto was designed to work well with [heroku](http://heroku.com), it makes the most out of it's state-of-the-art caching, 
 by setting the _Cache-Control_ and _Etag_ HTTP headers. Deploying on Heroku is really easy, just get the heroku gem, 
 create a heroku app with `heroku create`, and push with `git push heroku master`.
 
