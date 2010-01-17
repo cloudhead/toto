@@ -29,11 +29,11 @@ how it works
 synopsis
 --------
 
-One would start by forking or cloning the toto-skeleton repo, to get a basic skeleton:
+One would start by forking or cloning the `dorothy` repo, to get a basic skeleton:
     
     $ mkdir weblog/
     $ cd weblog/
-    $ git clone git://github.com/cloudhead/toto-skeleton.git .
+    $ git clone git://github.com/cloudhead/dorothy.git .
 
 One would then edit the template at will, it has the following structure:
 
@@ -104,15 +104,15 @@ create a heroku app with `heroku create`, and push with `git push heroku master`
 ### configuration
 
 You can configure toto, by modifying the _config.ru_ file. For example, if you want to set the blog author to 'John Galt',
-you could add `set :author, 'John Galt'` inside the `Toto::Server.new` block. Here's the options hash with the defaults: 
+you could add `set :author, 'John Galt'` inside the `Toto::Server.new` block. Here are the defaults, to get you started: 
 
-    :author   => ENV['USER'],                               # blog author 
-    :title    => Dir.pwd.split('/').last,                   # site title
-    :root     => "index",                                   # page to load on / 
-    :date     => lambda {|now| now.strftime("%d/%m/%Y") },  # date format for articles 
-    :markdown => :smart,                                    # use markdown + smart-mode 
-    :disqus   => false,                                     # disqus id, or false 
-    :summary  => 150,                                       # length of article summary 
-    :ext      => 'txt'                                      # file extension for articles 
+    set :author,    ENV['USER']                               # blog author 
+    set :title,     Dir.pwd.split('/').last                   # site title
+    set :root,      "index"                                   # page to load on / 
+    set :date,      lambda {|now| now.strftime("%d/%m/%Y") }  # date format for articles 
+    set :markdown,  :smart                                    # use markdown + smart-mode 
+    set :disqus,    false                                     # disqus id, or false 
+    set :summary,   150                                       # length of article summary 
+    set :ext,       'txt'                                     # file extension for articles 
 
 Copyright (c) 2009 cloudhead. See LICENSE for details.
