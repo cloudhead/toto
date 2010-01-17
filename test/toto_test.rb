@@ -29,6 +29,12 @@ context Toto do
     end
   end
 
+  context "GET /about" do
+    setup { @toto.get('/about') }
+    asserts("returns a 200")                { topic.status }.equals 200
+    asserts("body is not empty")            { not topic.body.empty? }
+  end
+
   context "GET a single article" do
     setup { @toto.get("/1900/05/17/the-wonderful-wizard-of-oz") }
     asserts("returns a 200")                { topic.status }.equals 200
@@ -56,7 +62,7 @@ context Toto do
 
   context "GET to an unknown route" do
     setup { @toto.get('/unknown') }
-    should("returns a 401") { topic.status }.equals 401
+    should("returns a 404") { topic.status }.equals 404
   end
 
   context "Request is invalid" do

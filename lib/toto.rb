@@ -83,27 +83,25 @@ module Toto
 
       body, status = if Context.new.respond_to?(:"to_#{type}")
         if route.first =~ /\d{4}/
-          begin
-            case route.size
-              when 1..3
-                [Context.new(archives(route * '-'), @config).render(:archives, type), 200]
-              when 4
-                [Context.new(article(route), @config).render(:article, type), 200]
-              else http 400
-            end
-          rescue Errno::ENOENT => e
-            $stderr.puts e
-            http 404
+          case route.size
+            when 1..3
+              [Context.new(archives(route * '-'), @config).render(:archives, type), 200]
+            when 4
+              [Context.new(article(route), @config).render(:article, type), 200]
+            else http 400
           end
         elsif respond_to?(route = route.first.to_sym)
           [Context.new(send(route, type), @config).render(route, type), 200]
         else
-          http 401
+          [Context.new({}, @config).render(route.to_sym, type), 200]
         end
       else
         http 400
       end
 
+    rescue Errno::ENOENT => e
+      body, status = http 404
+    ensure
       return :body => body, :type => type, :status => status
     end
 
