@@ -201,8 +201,11 @@ module Toto
       "http://#{(@config[:url].sub("http://", '') + self.path).squeeze('/')}"
     end
 
+    def body
+      markdown self[:body].sub(@config[:summary][:delim], '') rescue markdown self[:body]
+    end
+
     def title()   self[:title] || "an article"               end
-    def body()    markdown self[:body]                       end
     def date()    @config[:date, self[:date]]                end
     def path()    self[:date].strftime("/%Y/%m/%d/#{slug}/") end
     def author()  self[:author] || @config[:author]          end

@@ -111,6 +111,7 @@ context Toto do
       end
 
       should("split the article at the delimiter") { topic.summary }.equals "Well,\nhello"
+      should("not have the delimiter in the body") { topic.body !~ /~/ }
     end
 
     context "with everything specified" do
