@@ -187,8 +187,14 @@ module Toto
       self[:title].downcase.gsub(/&/, 'and').gsub(/\s+/, '-').gsub(/[^a-z0-9-]/, '')
     end
 
-    def summary length = @config[:summary]
-      markdown self[:body].match(/(.{1,#{length}}.*?)(\n|\Z)/m).to_s
+    def summary length = nil
+      length ||= (config = @config[:summary]).is_a?(Hash) ? config[:max] : config
+
+      if self[:body] =~ config[:delim]
+        markdown self[:body].split(config[:delim]).first
+      else
+        markdown self[:body].match(/(.{1,#{length}}.*?)(\n|\Z)/m).to_s
+      end
     end
 
     def url
@@ -228,7 +234,7 @@ module Toto
       :date => lambda {|now| now.strftime("%d/%m/%Y") },  # date function
       :markdown => :smart,                                # use markdown
       :disqus => false,                                   # disqus name
-      :summary => 150,                                    # length of summary
+      :summary => {:max => 150, :delim => /~\n/},         # length of summary and delimiter
       :ext => 'txt'                                       # extension for articles
     }
     def initialize obj

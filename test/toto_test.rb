@@ -102,6 +102,17 @@ context Toto do
       should("have a url")                 { topic.url }.equals Time.now.strftime("#{URL}/%Y/%m/%d/toto-and-the-wizard-of-oz/")
     end
 
+    context "with a user-defined summary" do
+      setup do
+        Toto::Article.new({
+          :title => "Toto & The Wizard of Oz.",
+          :body => "Well,\nhello ~\n, *stranger*."
+        }, @config.merge(:markdown => false, :summary => {:max => 150, :delim => /~\n/}))
+      end
+
+      should("split the article at the delimiter") { topic.summary }.equals "Well,\nhello"
+    end
+
     context "with everything specified" do
       setup do
         Toto::Article.new({
