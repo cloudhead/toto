@@ -26,6 +26,8 @@ how it works
 - individual articles can be accessed through urls such as _/2009/11/21/blogging-with-toto_
 - the archives can be accessed by year, month or day, wih the same format as above.
 - arbitrary metadata can be included in articles files, and accessed from the templates.
+- summaries are generated intelligently by toto, following the `:max` setting you give it.
+- you can also define how long your summary is, by adding `~` at the end of it (`:delim`).
 
 synopsis
 --------
@@ -113,7 +115,7 @@ you could add `set :author, 'John Galt'` inside the `Toto::Server.new` block. He
     set :date,      lambda {|now| now.strftime("%d/%m/%Y") }  # date format for articles 
     set :markdown,  :smart                                    # use markdown + smart-mode 
     set :disqus,    false                                     # disqus id, or false 
-    set :summary,   150                                       # length of article summary 
+    set :summary,   :max => 150, :delim => /~\n/              # length of article summary and delimiter 
     set :ext,       'txt'                                     # file extension for articles 
 
 Copyright (c) 2009 cloudhead. See LICENSE for details.
