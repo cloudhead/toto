@@ -200,6 +200,7 @@ module Toto
     def url
       "http://#{(@config[:url].sub("http://", '') + self.path).squeeze('/')}"
     end
+    alias :permalink url
 
     def body
       markdown self[:body].sub(@config[:summary][:delim], '') rescue markdown self[:body]
