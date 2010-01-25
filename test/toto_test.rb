@@ -53,6 +53,7 @@ context Toto do
       setup { @toto.get('/2009/12') }
       asserts("returns a 200")                      { topic.status }.equals 200
       should("includes the entries for that month") { topic.body }.includes_elements("li.entry", 2)
+      should("includes the year & month")           { topic.body }.includes_html("h1" => /2009\/12/)
     end
 
     context "through /archive" do

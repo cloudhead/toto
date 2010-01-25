@@ -79,21 +79,21 @@ module Toto
 
     def go route, type = :html
       route << self./ if route.empty?
-      type = type.to_sym
+      type, path = type.to_sym, route.join('/')
 
       body, status = if Context.new.respond_to?(:"to_#{type}")
         if route.first =~ /\d{4}/
           case route.size
             when 1..3
-              [Context.new(archives(route * '-'), @config).render(:archives, type), 200]
+              [Context.new(archives(route * '-'), @config, path).render(:archives, type), 200]
             when 4
-              [Context.new(article(route), @config).render(:article, type), 200]
+              [Context.new(article(route), @config, path).render(:article, type), 200]
             else http 400
           end
         elsif respond_to?(route = route.first.to_sym)
-          [Context.new(send(route, type), @config).render(route, type), 200]
+          [Context.new(send(route, type), @config, path).render(route, type), 200]
         else
-          [Context.new({}, @config).render(route.to_sym, type), 200]
+          [Context.new({}, @config, path).render(route.to_sym, type), 200]
         end
       else
         http 400
@@ -118,8 +118,8 @@ module Toto
     class Context
       include Template
 
-      def initialize ctx = {}, config = {}
-        @config, @ctx = config, ctx
+      def initialize ctx = {}, config = {}, path = "/"
+        @config, @ctx, @path = config, ctx, path
         ctx.each do |k, v|
           meta_def(k) { ctx.instance_of?(Hash) ? v : ctx.send(k) }
         end
