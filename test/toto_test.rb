@@ -131,7 +131,7 @@ context Toto do
       should("use the author") { topic.author }.equals "toetoe"
 
       context "and long first paragraph" do
-        should("create a valid summary") { topic.summary }.equals "<p>" + "a little bit of text." * 5 + "</p>\n"
+        should("create a valid summary") { topic.summary }.equals "<p>" + ("a little bit of text." * 5).chop + "&hellip;</p>\n"
       end
 
       context "and a short first paragraph" do
