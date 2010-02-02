@@ -15,8 +15,11 @@ philosophy
 Everything that can be done better with another tool should be, but one should not have too much pie to stay fit.
 In other words, toto does away with web frameworks or DSLs such as sinatra, and is built right on top of **rack**.
 There is no database or ORM either, we use plain text files.
+
 Toto was designed to be used with a reverse-proxy cache, such as [Varnish](http://varnish-cache.org).
 This makes it an ideal candidate for [heroku](http://heroku.com).
+
+Oh, and everything that can be done with git, _is_.
 
 how it works
 ------------
