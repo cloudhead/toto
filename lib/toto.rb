@@ -112,7 +112,11 @@ module Toto
     end
 
     def articles
-      Dir["#{Paths[:articles]}/*.#{self[:ext]}"]
+      self.class.articles self[:ext]
+    end
+
+    def self.articles ext
+      Dir["#{Paths[:articles]}/*.#{ext}"]
     end
 
     class Context
@@ -120,6 +124,10 @@ module Toto
 
       def initialize ctx = {}, config = {}, path = "/"
         @config, @ctx, @path = config, ctx, path
+        @articles = Site.articles(@config[:ext]).reverse.map do |a|
+          Article.new(File.new(a), @config)
+        end
+
         ctx.each do |k, v|
           meta_def(k) { ctx.instance_of?(Hash) ? v : ctx.send(k) }
         end

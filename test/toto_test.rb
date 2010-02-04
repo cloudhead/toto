@@ -33,6 +33,7 @@ context Toto do
     setup { @toto.get('/about') }
     asserts("returns a 200")                { topic.status }.equals 200
     asserts("body is not empty")            { not topic.body.empty? }
+    should("have access to @articles")      { topic.body }.includes_html("#count" => /5/)
   end
 
   context "GET a single article" do
