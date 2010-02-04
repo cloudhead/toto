@@ -123,7 +123,7 @@ module Toto
       include Template
 
       def initialize ctx = {}, config = {}, path = "/"
-        @config, @ctx, @path = config, ctx, path
+        @config, @context, @path = config, ctx, path
         @articles = Site.articles(@config[:ext]).reverse.map do |a|
           Article.new(File.new(a), @config)
         end
@@ -146,6 +146,10 @@ module Toto
         instance_eval File.read("#{Paths[:templates]}/#{page}.builder")
       end
       alias :to_atom to_xml
+
+      def method_missing m, *args, &blk
+        @context.respond_to?(m) ? @context.send(m) : super
+      end
     end
   end
 
