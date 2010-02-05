@@ -120,6 +120,7 @@ you could add `set :author, 'John Galt'` inside the `Toto::Server.new` block. He
 
     set :author,    ENV['USER']                               # blog author 
     set :title,     Dir.pwd.split('/').last                   # site title
+    set :url,       'http://example.com'                      # site root URL
     set :root,      "index"                                   # page to load on / 
     set :date,      lambda {|now| now.strftime("%d/%m/%Y") }  # date format for articles 
     set :markdown,  :smart                                    # use markdown + smart-mode 
