@@ -58,7 +58,7 @@ module Toto
       end
     end
 
-    def archives filter = //
+    def archives filter = ""
       entries = ! self.articles.empty??
         self.articles.select do |a|
           filter !~ /^\d{4}/ || File.basename(a) =~ /^#{filter}/
