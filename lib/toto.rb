@@ -253,6 +253,7 @@ module Toto
       :disqus => false,                                   # disqus name
       :summary => {:max => 150, :delim => /~\n/},         # length of summary and delimiter
       :ext => 'txt'                                       # extension for articles
+      :cache => 28800                                     # cache duration (seconds)
     }
     def initialize obj
       self.update Defaults
@@ -291,7 +292,7 @@ module Toto
       @response['Content-Type']   = Rack::Mime.mime_type(".#{response[:type]}")
 
       # Cache for one day
-      @response['Cache-Control'] = "public, max-age=86400"
+      @response['Cache-Control'] = "public, max-age=#{@config[:cache]}"
       @response['Etag'] = Digest::SHA1.hexdigest(response[:body])
 
       @response.status = response[:status]
