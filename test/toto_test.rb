@@ -83,7 +83,7 @@ context Toto do
     setup do
       @config[:markdown] = true
       @config[:date] = lambda {|t| "the time is #{t.strftime("%Y/%m/%d %H:%M")}" }
-      @config[:summary] = 50
+      @config[:summary] = {:length => 50}
     end
 
     context "with the bare essentials" do
