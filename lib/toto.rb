@@ -251,7 +251,7 @@ module Toto
       :markdown => :smart,                                # use markdown
       :disqus => false,                                   # disqus name
       :summary => {:max => 150, :delim => /~\n/},         # length of summary and delimiter
-      :ext => 'txt'                                       # extension for articles
+      :ext => 'txt',                                      # extension for articles
       :cache => 28800                                     # cache duration (seconds)
     }
     def initialize obj
