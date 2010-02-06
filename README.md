@@ -6,13 +6,20 @@ the tiniest blogging engine in Oz!
 introduction
 ------------
 
-toto is a git-powered, minimalist blog engine for the hackers of Oz. The engine weights around ~200 sloc at its worse.
+toto is a git-powered, minimalist blog engine for the hackers of Oz. The engine weights around ~300 sloc at its worse.
 There is no toto client, at least for now; everything goes through git.
 
 philosophy
 ----------
 
 Everything that can be done better with another tool should be, but one should not have too much pie to stay fit.
+In other words, toto does away with web frameworks or DSLs such as sinatra, and is built right on top of **rack**.
+There is no database or ORM either, we use plain text files.
+
+Toto was designed to be used with a reverse-proxy cache, such as [Varnish](http://varnish-cache.org).
+This makes it an ideal candidate for [heroku](http://heroku.com).
+
+Oh, and everything that can be done with git, _is_.
 
 how it works
 ------------
@@ -22,10 +29,14 @@ how it works
 - articles are processed through a markdown converter (rdiscount) by default.
 - templating is done through **ERB**.
 - toto is built right on top of **Rack**.
+- toto was built to take advantage of _HTTP caching_.
+- toto was built with heroku in mind.
 - comments are handled by [disqus](http://disqus.com)
 - individual articles can be accessed through urls such as _/2009/11/21/blogging-with-toto_
 - the archives can be accessed by year, month or day, wih the same format as above.
 - arbitrary metadata can be included in articles files, and accessed from the templates.
+- summaries are generated intelligently by toto, following the `:max` setting you give it.
+- you can also define how long your summary is, by adding `~` at the end of it (`:delim`).
 
 synopsis
 --------
@@ -109,11 +120,19 @@ you could add `set :author, 'John Galt'` inside the `Toto::Server.new` block. He
 
     set :author,    ENV['USER']                               # blog author 
     set :title,     Dir.pwd.split('/').last                   # site title
+    set :url,       'http://example.com'                      # site root URL
     set :root,      "index"                                   # page to load on / 
     set :date,      lambda {|now| now.strftime("%d/%m/%Y") }  # date format for articles 
     set :markdown,  :smart                                    # use markdown + smart-mode 
     set :disqus,    false                                     # disqus id, or false 
-    set :summary,   150                                       # length of article summary 
+    set :summary,   :max => 150, :delim => /~\n/              # length of article summary and delimiter 
     set :ext,       'txt'                                     # file extension for articles 
+
+thanks
+------
+
+To heroku for making this easy as pie.
+To adam wiggins, as I stole a couple of ideas from Scanty.
+To the developpers of Rack, for making such an awesome platform.
 
 Copyright (c) 2009 cloudhead. See LICENSE for details.

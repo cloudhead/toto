@@ -58,10 +58,10 @@ module Toto
       end
     end
 
-    def archives filter = //
+    def archives filter = ""
       entries = ! self.articles.empty??
         self.articles.select do |a|
-          File.basename(a) =~ /^#{filter}/
+          filter !~ /^\d{4}/ || File.basename(a) =~ /^#{filter}/
         end.reverse.map do |article|
           Article.new File.new(article), @config
         end : []
@@ -79,21 +79,21 @@ module Toto
 
     def go route, type = :html
       route << self./ if route.empty?
-      type = type.to_sym
+      type, path = type.to_sym, route.join('/')
 
       body, status = if Context.new.respond_to?(:"to_#{type}")
         if route.first =~ /\d{4}/
           case route.size
             when 1..3
-              [Context.new(archives(route * '-'), @config).render(:archives, type), 200]
+              [Context.new(archives(route * '-'), @config, path).render(:archives, type), 200]
             when 4
-              [Context.new(article(route), @config).render(:article, type), 200]
+              [Context.new(article(route), @config, path).render(:article, type), 200]
             else http 400
           end
         elsif respond_to?(route = route.first.to_sym)
-          [Context.new(send(route, type), @config).render(route, type), 200]
+          [Context.new(send(route, type), @config, path).render(route, type), 200]
         else
-          [Context.new({}, @config).render(route.to_sym, type), 200]
+          [Context.new({}, @config, path).render(route.to_sym, type), 200]
         end
       else
         http 400
@@ -112,14 +112,22 @@ module Toto
     end
 
     def articles
-      Dir["#{Paths[:articles]}/*.#{self[:ext]}"]
+      self.class.articles self[:ext]
+    end
+
+    def self.articles ext
+      Dir["#{Paths[:articles]}/*.#{ext}"]
     end
 
     class Context
       include Template
 
-      def initialize ctx = {}, config = {}
-        @config, @ctx = config, ctx
+      def initialize ctx = {}, config = {}, path = "/"
+        @config, @context, @path = config, ctx, path
+        @articles = Site.articles(@config[:ext]).reverse.map do |a|
+          Article.new(File.new(a), @config)
+        end
+
         ctx.each do |k, v|
           meta_def(k) { ctx.instance_of?(Hash) ? v : ctx.send(k) }
         end
@@ -138,6 +146,10 @@ module Toto
         instance_eval File.read("#{Paths[:templates]}/#{page}.builder")
       end
       alias :to_atom to_xml
+
+      def method_missing m, *args, &blk
+        @context.respond_to?(m) ? @context.send(m) : super
+      end
     end
   end
 
@@ -187,16 +199,27 @@ module Toto
       self[:title].downcase.gsub(/&/, 'and').gsub(/\s+/, '-').gsub(/[^a-z0-9-]/, '')
     end
 
-    def summary length = @config[:summary]
-      markdown self[:body].match(/(.{1,#{length}}.*?)(\n|\Z)/m).to_s
+    def summary length = nil
+      length ||= (config = @config[:summary]).is_a?(Hash) ? config[:max] : config
+
+      sum = if self[:body] =~ config[:delim]
+        self[:body].split(config[:delim]).first
+      else
+        self[:body].match(/(.{1,#{length}}.*?)(\n|\Z)/m).to_s
+      end
+      markdown(sum.length == self[:body].length ? sum : sum.strip.sub(/\.\Z/, '&hellip;'))
     end
 
     def url
       "http://#{(@config[:url].sub("http://", '') + self.path).squeeze('/')}"
     end
+    alias :permalink url
+
+    def body
+      markdown self[:body].sub(@config[:summary][:delim], '') rescue markdown self[:body]
+    end
 
     def title()   self[:title] || "an article"               end
-    def body()    markdown self[:body]                       end
     def date()    @config[:date, self[:date]]                end
     def path()    self[:date].strftime("/%Y/%m/%d/#{slug}/") end
     def author()  self[:author] || @config[:author]          end
@@ -228,7 +251,7 @@ module Toto
       :date => lambda {|now| now.strftime("%d/%m/%Y") },  # date function
       :markdown => :smart,                                # use markdown
       :disqus => false,                                   # disqus name
-      :summary => 150,                                    # length of summary
+      :summary => {:max => 150, :delim => /~\n/},         # length of summary and delimiter
       :ext => 'txt'                                       # extension for articles
     }
     def initialize obj

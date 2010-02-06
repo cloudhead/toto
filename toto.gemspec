@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{toto}
-  s.version = "0.2.0"
+  s.version = "0.2.7"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["cloudhead"]
-  s.date = %q{2010-01-17}
+  s.date = %q{2010-02-04}
   s.description = %q{the tiniest blog-engine in Oz.}
   s.email = %q{self@cloudhead.net}
   s.extra_rdoc_files = [
@@ -31,6 +31,7 @@ Gem::Specification.new do |s|
      "test/articles/2009-12-04-some-random-article.txt",
      "test/articles/2009-12-11-the-dichotomy-of-design.txt",
      "test/autotest.rb",
+     "test/templates/about.rhtml",
      "test/templates/archives.rhtml",
      "test/templates/article.rhtml",
      "test/templates/feed.builder",

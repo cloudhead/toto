@@ -33,6 +33,7 @@ context Toto do
     setup { @toto.get('/about') }
     asserts("returns a 200")                { topic.status }.equals 200
     asserts("body is not empty")            { not topic.body.empty? }
+    should("have access to @articles")      { topic.body }.includes_html("#count" => /5/)
   end
 
   context "GET a single article" do
@@ -53,6 +54,7 @@ context Toto do
       setup { @toto.get('/2009/12') }
       asserts("returns a 200")                      { topic.status }.equals 200
       should("includes the entries for that month") { topic.body }.includes_elements("li.entry", 2)
+      should("includes the year & month")           { topic.body }.includes_html("h1" => /2009\/12/)
     end
 
     context "through /archive" do
@@ -102,6 +104,18 @@ context Toto do
       should("have a url")                 { topic.url }.equals Time.now.strftime("#{URL}/%Y/%m/%d/toto-and-the-wizard-of-oz/")
     end
 
+    context "with a user-defined summary" do
+      setup do
+        Toto::Article.new({
+          :title => "Toto & The Wizard of Oz.",
+          :body => "Well,\nhello ~\n, *stranger*."
+        }, @config.merge(:markdown => false, :summary => {:max => 150, :delim => /~\n/}))
+      end
+
+      should("split the article at the delimiter") { topic.summary }.equals "Well,\nhello"
+      should("not have the delimiter in the body") { topic.body !~ /~/ }
+    end
+
     context "with everything specified" do
       setup do
         Toto::Article.new({
@@ -118,7 +132,7 @@ context Toto do
       should("use the author") { topic.author }.equals "toetoe"
 
       context "and long first paragraph" do
-        should("create a valid summary") { topic.summary }.equals "<p>" + "a little bit of text." * 5 + "</p>\n"
+        should("create a valid summary") { topic.summary }.equals "<p>" + ("a little bit of text." * 5).chop + "&hellip;</p>\n"
       end
 
       context "and a short first paragraph" do
