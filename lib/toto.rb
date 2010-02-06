@@ -110,7 +110,7 @@ module Toto
     rescue Errno::ENOENT => e
       body, status = http 404
     ensure
-      return :body => body, :type => type, :status => status
+      return :body => body || "", :type => type, :status => status
     end
 
   protected
@@ -295,7 +295,7 @@ module Toto
       response = Toto::Site.new(@config).go(route, *(mime ? mime : []))
 
       @response.body = [response[:body]]
-      @response['Content-Length'] = response[:body].length.to_s
+      @response['Content-Length'] = response[:body].length.to_s unless response[:body].empty?
       @response['Content-Type']   = Rack::Mime.mime_type(".#{response[:type]}")
 
       # Set http cache headers
