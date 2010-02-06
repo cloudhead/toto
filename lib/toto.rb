@@ -18,6 +18,14 @@ module Toto
     :articles => "articles"
   }
 
+  def self.env
+    ENV['RACK_ENV'] || 'production'
+  end
+
+  def self.env= env
+    ENV['RACK_ENV'] = env
+  end
+
   module Template
     def to_html page, &blk
       path = (page == :layout ? Paths[:templates] : Paths[:pages])
@@ -290,8 +298,13 @@ module Toto
       @response['Content-Length'] = response[:body].length.to_s
       @response['Content-Type']   = Rack::Mime.mime_type(".#{response[:type]}")
 
-      # Cache for one day
-      @response['Cache-Control'] = "public, max-age=#{@config[:cache]}"
+      # Set http cache headers
+      @response['Cache-Control'] = if Toto.env == 'production'
+        "public, max-age=#{@config[:cache]}"
+      else
+        "no-cache, must-revalidate"
+      end
+
       @response['Etag'] = Digest::SHA1.hexdigest(response[:body])
 
       @response.status = response[:status]
