@@ -203,8 +203,7 @@ module Toto
     end
 
     def slug
-      self[:slug] ||
-      self[:title].downcase.gsub(/&/, 'and').gsub(/\s+/, '-').gsub(/[^a-z0-9-]/, '')
+      self[:slug] || self[:title].slugize
     end
 
     def summary length = nil
