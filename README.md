@@ -46,14 +46,21 @@ how it works
 - summaries are generated intelligently by toto, following the `:max` setting you give it.
 - you can also define how long your summary is, by adding `~` at the end of it (`:delim`).
 
+dorothy
+-------
+
+Dorothy is toto's default template, you can get it at <http://github.com/cloudhead/dorothy>. It
+comes with a very minimalistic but functional template, and a _config.ru_ file to get you started.
+It also includes a _.gems_ file, for heroku.
+
 synopsis
 --------
 
-One would start by forking or cloning the `dorothy` repo, to get a basic skeleton:
+One would start by installing _toto_, with `sudo gem install toto`, and then forking or
+cloning the `dorothy` repo, to get a basic skeleton:
     
-    $ mkdir weblog/
+    $ git clone git://github.com/cloudhead/dorothy.git weblog
     $ cd weblog/
-    $ git clone git://github.com/cloudhead/dorothy.git .
 
 One would then edit the template at will, it has the following structure:
 
