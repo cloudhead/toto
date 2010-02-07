@@ -93,24 +93,24 @@ module Toto
         if route.first =~ /\d{4}/
           case route.size
             when 1..3
-              [Context.new(archives(route * '-'), @config, path).render(:archives, type), 200]
+              Context.new(archives(route * '-'), @config, path).render(:archives, type)
             when 4
-              [Context.new(article(route), @config, path).render(:article, type), 200]
+              Context.new(article(route), @config, path).render(:article, type)
             else http 400
           end
         elsif respond_to?(route = route.first.to_sym)
-          [Context.new(send(route, type), @config, path).render(route, type), 200]
+          Context.new(send(route, type), @config, path).render(route, type)
         else
-          [Context.new({}, @config, path).render(route.to_sym, type), 200]
+          Context.new({}, @config, path).render(route.to_sym, type)
         end
       else
         http 400
       end
 
     rescue Errno::ENOENT => e
-      body, status = http 404
-    ensure
-      return :body => body || "", :type => type, :status => status
+      return :body => http(404).first, :type => :html, :status => 404
+    else
+      return :body => body || "", :type => type, :status => status || 200
     end
 
   protected
