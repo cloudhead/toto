@@ -9,7 +9,7 @@ require 'builder'
 
 $:.unshift File.dirname(__FILE__)
 
-require 'ext'
+require 'ext/ext'
 
 module Toto
   Paths = {
