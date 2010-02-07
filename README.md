@@ -9,6 +9,14 @@ introduction
 toto is a git-powered, minimalist blog engine for the hackers of Oz. The engine weights around ~300 sloc at its worse.
 There is no toto client, at least for now; everything goes through git.
 
+blog in 10 seconds
+------------------
+
+    $ git clone git://github.com/cloudhead/dorothy.git myblog
+    $ cd myblog
+    $ heroku create myblog
+    $ git push heroku master
+
 philosophy
 ----------
 
@@ -24,7 +32,7 @@ Oh, and everything that can be done with git, _is_.
 how it works
 ------------
 
-- content is entirely managed trough **git**; you get full fledged version control for free.
+- content is entirely managed through **git**; you get full fledged version control for free.
 - articles are stored as _.txt_ files, with embeded metadata (in yaml format).
 - articles are processed through a markdown converter (rdiscount) by default.
 - templating is done through **ERB**.
@@ -108,8 +116,7 @@ Toto was designed to work well with [heroku](http://heroku.com), it makes the mo
 by setting the _Cache-Control_ and _Etag_ HTTP headers. Deploying on Heroku is really easy, just get the heroku gem, 
 create a heroku app with `heroku create`, and push with `git push heroku master`.
 
-    $ heroku create
-    $ heroku rename weblog
+    $ heroku create weblog
     $ git push heroku master
     $ heroku open
 
@@ -127,6 +134,7 @@ you could add `set :author, 'John Galt'` inside the `Toto::Server.new` block. He
     set :disqus,    false                                     # disqus id, or false 
     set :summary,   :max => 150, :delim => /~\n/              # length of article summary and delimiter 
     set :ext,       'txt'                                     # file extension for articles 
+    set :cache,     28800                                     # cache site for 8 hours
 
 thanks
 ------
