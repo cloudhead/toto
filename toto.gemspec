@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{toto}
-  s.version = "0.2.7"
+  s.version = "0.2.8"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["cloudhead"]
-  s.date = %q{2010-02-04}
+  s.date = %q{2010-02-06}
   s.description = %q{the tiniest blog-engine in Oz.}
   s.email = %q{self@cloudhead.net}
   s.extra_rdoc_files = [
@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
      "README.md",
      "Rakefile",
      "VERSION",
-     "lib/ext.rb",
+     "lib/ext/ext.rb",
      "lib/toto.rb",
      "test/articles/1900-05-17-the-wonderful-wizard-of-oz.txt",
      "test/articles/2001-01-01-two-thousand-and-one.txt",
