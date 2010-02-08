@@ -79,6 +79,12 @@ context Toto do
     asserts("summary shouldn't be empty")   { topic.body }.includes_html("summary" => /.{10,}/)
   end
 
+  context "GET to a repo name" do
+    setup do
+      @toto.get('/the-repo')
+    end
+  end
+
   context "creating an article" do
     setup do
       @config[:markdown] = true

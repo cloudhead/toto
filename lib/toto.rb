@@ -3,6 +3,7 @@ require 'time'
 require 'erb'
 require 'rack'
 require 'digest'
+require 'open-uri'
 
 require 'rdiscount'
 require 'builder'
@@ -18,6 +19,8 @@ module Toto
     :articles => "articles"
   }
 
+  README = "http://github.com/%s/%s/raw/master/README.%s"
+
   def self.env
     ENV['RACK_ENV'] || 'production'
   end
@@ -28,7 +31,7 @@ module Toto
 
   module Template
     def to_html page, &blk
-      path = (page == :layout ? Paths[:templates] : Paths[:pages])
+      path = ([:layout, :repo].include?(page) ? Paths[:templates] : Paths[:pages])
       ERB.new(File.read("#{path}/#{page}.rhtml")).result(binding)
     end
 
@@ -106,16 +109,19 @@ module Toto
               Context.new(article(route), @config, path).render(:article, type)
             else http 400
           end
-        elsif respond_to?(route = route.first.to_sym)
-          Context.new(send(route, type), @config, path).render(route, type)
+        elsif respond_to?(path)
+          Context.new(send(path, type), @config, path).render(path.to_sym, type)
+        elsif @config[:github][:repos].include?(path) &&
+             !@config[:github][:user].empty?
+          Context.new(Repo.new(path)).render(:repo, type)
         else
-          Context.new({}, @config, path).render(route.to_sym, type)
+          Context.new({}, @config, path).render(path.to_sym, type)
         end
       else
         http 400
       end
 
-    rescue Errno::ENOENT => e
+    rescue Errno::ENOENT, OpenURI::HTTPError => e
       return :body => http(404).first, :type => :html, :status => 404
     else
       return :body => body || "", :type => type, :status => status || 200
@@ -167,6 +173,22 @@ module Toto
         @context.respond_to?(m) ? @context.send(m) : super
       end
     end
+  end
+
+  class Repo < Hash
+    include Template
+
+    def initialize name, config
+      self[:name], @config = name, config
+    end
+
+    def readme
+      markdown open(README %
+        [@config[:github][:user], self[:name], @config[:github][:ext]]).read
+    rescue Timeout::Error
+      "This page isn't available."
+    end
+    alias :content readme
   end
 
   class Archives < Array
@@ -257,7 +279,8 @@ module Toto
       :disqus => false,                                   # disqus name
       :summary => {:max => 150, :delim => /~\n/},         # length of summary and delimiter
       :ext => 'txt',                                      # extension for articles
-      :cache => 28800                                     # cache duration (seconds)
+      :cache => 28800,                                    # cache duration (seconds)
+      :github => {:user => "", :repos => [], :ext => 'md'}# Github username and list of repos
     }
     def initialize obj
       self.update Defaults
