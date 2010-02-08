@@ -32,6 +32,14 @@ module Toto
       ERB.new(File.read("#{path}/#{page}.rhtml")).result(binding)
     end
 
+    def markdown text
+      if (options = @config[:markdown])
+        Markdown.new(text.to_s.strip, *(options.eql?(true) ? [] : options)).to_html
+      else
+        text.strip
+      end
+    end
+
     def self.included obj
       obj.class_eval do
         define_method(obj.to_s.split('::').last.downcase) { self }
@@ -235,16 +243,6 @@ module Toto
 
     def method_missing m, *args, &blk
       self.keys.include?(m) ? self[m] : super
-    end
-
-  private
-
-    def markdown text
-      if (options = @config[:markdown])
-        Markdown.new(text.to_s.strip, *(options.eql?(true) ? [] : options)).to_html
-      else
-        text.strip
-      end
     end
   end
 
