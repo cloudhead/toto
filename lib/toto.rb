@@ -121,7 +121,7 @@ module Toto
         http 400
       end
 
-    rescue Errno::ENOENT, OpenURI::HTTPError => e
+    rescue Errno::ENOENT => e
       return :body => http(404).first, :type => :html, :status => 404
     else
       return :body => body || "", :type => type, :status => status || 200
@@ -185,7 +185,7 @@ module Toto
     def readme
       markdown open(README %
         [@config[:github][:user], self[:name], @config[:github][:ext]]).read
-    rescue Timeout::Error
+    rescue Timeout::Error, OpenURI::HTTPError => e
       "This page isn't available."
     end
     alias :content readme
