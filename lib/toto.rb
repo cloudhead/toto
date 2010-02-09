@@ -41,6 +41,10 @@ module Toto
       end
     end
 
+    def method_missing m, *args, &blk
+      self.keys.include?(m) ? self[m] : super
+    end
+
     def self.included obj
       obj.class_eval do
         define_method(obj.to_s.split('::').last.downcase) { self }
