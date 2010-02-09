@@ -97,23 +97,26 @@ module Toto
     def go route, type = :html
       route << self./ if route.empty?
       type, path = type.to_sym, route.join('/')
+      context = lambda do |data, page|
+        Context.new(data, @config, path).render(page, type)
+      end
 
       body, status = if Context.new.respond_to?(:"to_#{type}")
         if route.first =~ /\d{4}/
           case route.size
             when 1..3
-              Context.new(archives(route * '-'), @config, path).render(:archives, type)
+              context[archives(route * '-'), :archives]
             when 4
-              Context.new(article(route), @config, path).render(:article, type)
+              context[article(route), :article]
             else http 400
           end
         elsif respond_to?(path)
-          Context.new(send(path, type), @config, path).render(path.to_sym, type)
+          context[send(path, type), path.to_sym]
         elsif @config[:github][:repos].include?(path) &&
              !@config[:github][:user].empty?
-          Context.new(Repo.new(path, @config), @config, path).render(:repo, type)
+          context[Repo.new(path, @config), :repo]
         else
-          Context.new({}, @config, path).render(path.to_sym, type)
+          context[{}, path.to_sym]
         end
       else
         http 400
