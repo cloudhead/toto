@@ -287,7 +287,13 @@ module Toto
       self.update obj
     end
 
-    alias set :[]=
+    def set key, val
+      if val.is_a? Hash
+        self[key].update val
+      else
+        self[key] = val
+      end
+    end
 
     def [] key, *args
       val = super(key)

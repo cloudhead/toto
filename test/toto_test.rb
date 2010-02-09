@@ -169,6 +169,17 @@ context Toto do
       end
     end
   end
+
+  context "using Config#set with a hash" do
+    setup do
+      conf = Toto::Config.new({})
+      conf.set(:summary, {:delim => /%/})
+      conf
+    end
+
+    should("set summary[:delim] to /%/") { topic[:summary][:delim].source }.equals "%"
+    should("leave the :max intact") { topic[:summary][:max] }.equals 150
+  end
 end
 
 
