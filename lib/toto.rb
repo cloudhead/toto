@@ -249,7 +249,7 @@ module Toto
       sum = if self[:body] =~ config[:delim]
         self[:body].split(config[:delim]).first
       else
-        self[:body].match(/(.{1,#{length || config[:length]}}.*?)(\n|\Z)/m).to_s
+        self[:body].match(/(.{1,#{length || config[:length] || config[:max]}}.*?)(\n|\Z)/m).to_s
       end
       markdown(sum.length == self[:body].length ? sum : sum.strip.sub(/\.\Z/, '&hellip;'))
     end
