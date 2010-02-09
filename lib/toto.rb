@@ -320,7 +320,7 @@ module Toto
       return [400, {}, []] unless @request.get?
 
       path, mime = @request.path_info.split('.')
-      route = path.split('/').reject {|i| i.empty? }
+      route = (path || '/').split('/').reject {|i| i.empty? }
 
       response = Toto::Site.new(@config).go(route, *(mime ? mime : []))
 
