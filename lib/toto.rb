@@ -270,9 +270,6 @@ module Toto
 
     alias :to_s to_html
 
-    def method_missing m, *args, &blk
-      self.keys.include?(m) ? self[m] : super
-    end
   end
 
   class Config < Hash
