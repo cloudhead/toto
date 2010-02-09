@@ -223,6 +223,7 @@ module Toto
     def load
       data = if @obj.is_a? File
         meta, self[:body] = @obj.read.split(/\n\n/, 2)
+        @obj.close
         YAML.load(meta)
       elsif @obj.is_a? Hash
         @obj
