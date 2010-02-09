@@ -111,7 +111,7 @@ module Toto
           Context.new(send(path, type), @config, path).render(path.to_sym, type)
         elsif @config[:github][:repos].include?(path) &&
              !@config[:github][:user].empty?
-          Context.new(Repo.new(path)).render(:repo, type)
+          Context.new(Repo.new(path, @config), @config, path).render(:repo, type)
         else
           Context.new({}, @config, path).render(path.to_sym, type)
         end
