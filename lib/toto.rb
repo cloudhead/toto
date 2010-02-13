@@ -223,6 +223,7 @@ module Toto
     def load
       data = if @obj.is_a? File
         meta, self[:body] = @obj.read.split(/\n\n/, 2)
+        @obj.close
         YAML.load(meta)
       elsif @obj.is_a? Hash
         @obj
@@ -248,7 +249,7 @@ module Toto
       sum = if self[:body] =~ config[:delim]
         self[:body].split(config[:delim]).first
       else
-        self[:body].match(/(.{1,#{length || config[:length]}}.*?)(\n|\Z)/m).to_s
+        self[:body].match(/(.{1,#{length || config[:length] || config[:max]}}.*?)(\n|\Z)/m).to_s
       end
       markdown(sum.length == self[:body].length ? sum : sum.strip.sub(/\.\Z/, '&hellip;'))
     end
@@ -320,7 +321,7 @@ module Toto
       return [400, {}, []] unless @request.get?
 
       path, mime = @request.path_info.split('.')
-      route = path.split('/').reject {|i| i.empty? }
+      route = (path || '/').split('/').reject {|i| i.empty? }
 
       response = Toto::Site.new(@config).go(route, *(mime ? mime : []))
 
