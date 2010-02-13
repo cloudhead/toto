@@ -69,11 +69,11 @@ module Toto
       case type
         when :html
           {:articles => self.articles.reverse.map do |article|
-              Article.new File.new(article), @config
+              Article.new article, @config
           end }.merge archives
         when :xml, :json
           return :articles => self.articles.map do |article|
-            Article.new File.new(article), @config
+            Article.new article, @config
           end
         else return {}
       end
@@ -84,14 +84,14 @@ module Toto
         self.articles.select do |a|
           filter !~ /^\d{4}/ || File.basename(a) =~ /^#{filter}/
         end.reverse.map do |article|
-          Article.new File.new(article), @config
+          Article.new article, @config
         end : []
 
       return :archives => Archives.new(entries)
     end
 
     def article route
-      Article.new(File.new("#{Paths[:articles]}/#{route.join('-')}.#{self[:ext]}"), @config).load
+      Article.new("#{Paths[:articles]}/#{route.join('-')}.#{self[:ext]}", @config).load
     end
 
     def /
@@ -152,7 +152,7 @@ module Toto
       def initialize ctx = {}, config = {}, path = "/"
         @config, @context, @path = config, ctx, path
         @articles = Site.articles(@config[:ext]).reverse.map do |a|
-          Article.new(File.new(a), @config)
+          Article.new(a, @config)
         end
 
         ctx.each do |k, v|
@@ -221,9 +221,8 @@ module Toto
     end
 
     def load
-      data = if @obj.is_a? File
-        meta, self[:body] = @obj.read.split(/\n\n/, 2)
-        @obj.close
+      data = if @obj.is_a? String
+        meta, self[:body] = File.read(@obj).split(/\n\n/, 2)
         YAML.load(meta)
       elsif @obj.is_a? Hash
         @obj
