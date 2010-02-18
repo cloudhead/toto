@@ -279,18 +279,18 @@ module Toto
 
   class Config < Hash
     Defaults = {
-      :author => ENV['USER'],                             # blog author
-      :title => Dir.pwd.split('/').last,                  # site title
-      :root => "index",                                   # site index
+      :author => ENV['USER'],                               # blog author
+      :title => Dir.pwd.split('/').last,                    # site title
+      :root => "index",                                     # site index
       :url => "http://127.0.0.1",
-      :date => lambda {|now| now.strftime("%d/%m/%Y") },  # date function
-      :markdown => :smart,                                # use markdown
-      :disqus => false,                                   # disqus name
-      :summary => {:max => 150, :delim => /~\n/},         # length of summary and delimiter
-      :ext => 'txt',                                      # extension for articles
-      :cache => 28800,                                    # cache duration (seconds)
-      :github => {:user => "", :repos => [], :ext => 'md'},# Github username and list of repos
-      :to_html => lambda {|path, page, ctx|               # returns an html, from a path & context
+      :date => lambda {|now| now.strftime("%d/%m/%Y") },    # date function
+      :markdown => :smart,                                  # use markdown
+      :disqus => false,                                     # disqus name
+      :summary => {:max => 150, :delim => /~\n/},           # length of summary and delimiter
+      :ext => 'txt',                                        # extension for articles
+      :cache => 28800,                                      # cache duration (seconds)
+      :github => {:user => "", :repos => [], :ext => 'md'}, # Github username and list of repos
+      :to_html => lambda {|path, page, ctx|                 # returns an html, from a path & context
         ERB.new(File.read("#{path}/#{page}.rhtml")).result(ctx)
       }
     }
