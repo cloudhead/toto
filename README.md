@@ -6,7 +6,7 @@ the tiniest blogging engine in Oz!
 introduction
 ------------
 
-toto is a git-powered, minimalist blog engine for the hackers of Oz. The engine weights around ~300 sloc at its worse.
+toto is a git-powered, minimalist blog engine for the hackers of Oz. The engine weighs around ~300 sloc at its worse.
 There is no toto client, at least for now; everything goes through git.
 
 blog in 10 seconds
@@ -142,6 +142,9 @@ you could add `set :author, 'John Galt'` inside the `Toto::Server.new` block. He
     set :summary,   :max => 150, :delim => /~\n/              # length of article summary and delimiter 
     set :ext,       'txt'                                     # file extension for articles 
     set :cache,     28800                                     # cache site for 8 hours
+    set :to_html,   lambda {|path, page, ctx|                 # returns an html, from a path & context
+        ERB.new(File.read("#{path}/#{page}.rhtml")).result(ctx)
+    }
 
 thanks
 ------
