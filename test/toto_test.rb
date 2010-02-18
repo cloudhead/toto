@@ -27,6 +27,21 @@ context Toto do
       asserts("body is not empty")          { not topic.body.empty? }
       asserts("returns a 200")              { topic.status }.equals 200
     end
+
+    context "with a user-defined to_html" do
+      setup do
+        @config[:to_html] = lambda do |path, page, binding|
+          ERB.new(File.read("#{path}/#{page}.rhtml")).result(binding)
+        end
+        @toto.get('/')
+      end
+
+      asserts("returns a 200")                { topic.status }.equals 200
+      asserts("body is not empty")            { not topic.body.empty? }
+      asserts("content type is set properly") { topic.content_type }.equals "text/html"
+      should("include a couple of article")   { topic.body }.includes_elements("#articles li", 3)
+      should("include an archive")            { topic.body }.includes_elements("#archives li", 2)
+    end
   end
 
   context "GET /about" do

@@ -28,9 +28,17 @@ module Toto
   end
 
   module Template
-    def to_html page, &blk
+    def to_html page, config, &blk
       path = ([:layout, :repo].include?(page) ? Paths[:templates] : Paths[:pages])
-      ERB.new(File.read("#{path}/#{page}.rhtml")).result(binding)
+      if config[:to_html].respond_to? :call
+        config[:to_html].call(path, page, binding)
+      else
+        self.parse(path, page, binding)
+      end
+    end
+
+    def parse path, page, ctx
+      ERB.new(File.read("#{path}/#{page}.rhtml")).result(ctx || binding)
     end
 
     def markdown text
@@ -87,7 +95,7 @@ module Toto
           Article.new article, @config
         end : []
 
-      return :archives => Archives.new(entries)
+      return :archives => Archives.new(entries, @config)
     end
 
     def article route
@@ -165,7 +173,7 @@ module Toto
       end
 
       def render page, type
-        type == :html ? to_html(:layout, &Proc.new { to_html page }) : send(:"to_#{type}", :feed)
+        type == :html ? to_html(:layout, @config, &Proc.new { to_html page, @config }) : send(:"to_#{type}", :feed)
       end
 
       def to_xml page
@@ -201,12 +209,17 @@ module Toto
   class Archives < Array
     include Template
 
-    def initialize articles
+    def initialize articles, config
       self.replace articles
+      @config = config
+    end
+
+    def [] a
+      a.is_a?(Range) ? self.class.new(self.slice(a) || [], @config) : super
     end
 
     def to_html
-      super(:archives)
+      super(:archives, @config)
     end
     alias :to_s to_html
     alias :archive archives
@@ -263,10 +276,10 @@ module Toto
     end
 
     def title()   self[:title] || "an article"               end
-    def date()    @config[:date, self[:date]]                end
+    def date()    @config[:date].call(self[:date])           end
     def path()    self[:date].strftime("/%Y/%m/%d/#{slug}/") end
     def author()  self[:author] || @config[:author]          end
-    def to_html() self.load; super(:article)                 end
+    def to_html() self.load; super(:article, @config)        end
 
     alias :to_s to_html
 
@@ -297,11 +310,6 @@ module Toto
       else
         self[key] = val
       end
-    end
-
-    def [] key, *args
-      val = super(key)
-      val.respond_to?(:call) ? val.call(*args) : val
     end
   end
 
