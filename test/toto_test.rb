@@ -195,6 +195,16 @@ context Toto do
     should("set summary[:delim] to /%/") { topic[:summary][:delim].source }.equals "%"
     should("leave the :max intact") { topic[:summary][:max] }.equals 150
   end
+
+  context "using Config#set with a block" do
+    setup do
+      conf = Toto::Config.new({})
+      conf.set(:to_html) {|path, p, _| path + p }
+      conf
+    end
+
+    should("set the value to a proc") { topic[:to_html] }.respond_to :call
+  end
 end
 
 
