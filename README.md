@@ -142,9 +142,9 @@ you could add `set :author, 'John Galt'` inside the `Toto::Server.new` block. He
     set :summary,   :max => 150, :delim => /~\n/              # length of article summary and delimiter 
     set :ext,       'txt'                                     # file extension for articles 
     set :cache,     28800                                     # cache site for 8 hours
-    set :to_html,   lambda {|path, page, ctx|                 # returns an html, from a path & context
+    set :to_html do |path, page, ctx|                         # returns an html, from a path & context
         ERB.new(File.read("#{path}/#{page}.rhtml")).result(ctx)
-    }
+    end
 
 thanks
 ------
