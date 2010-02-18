@@ -30,15 +30,7 @@ module Toto
   module Template
     def to_html page, config, &blk
       path = ([:layout, :repo].include?(page) ? Paths[:templates] : Paths[:pages])
-      if config[:to_html].respond_to? :call
-        config[:to_html].call(path, page, binding)
-      else
-        self.parse(path, page, binding)
-      end
-    end
-
-    def parse path, page, ctx
-      ERB.new(File.read("#{path}/#{page}.rhtml")).result(ctx || binding)
+      config[:to_html].call(path, page, binding)
     end
 
     def markdown text
@@ -297,7 +289,10 @@ module Toto
       :summary => {:max => 150, :delim => /~\n/},         # length of summary and delimiter
       :ext => 'txt',                                      # extension for articles
       :cache => 28800,                                    # cache duration (seconds)
-      :github => {:user => "", :repos => [], :ext => 'md'}# Github username and list of repos
+      :github => {:user => "", :repos => [], :ext => 'md'},# Github username and list of repos
+      :to_html => lambda {|path, page, ctx|               # returns an html, from a path & context
+        ERB.new(File.read("#{path}/#{page}.rhtml")).result(ctx)
+      }
     }
     def initialize obj
       self.update Defaults
