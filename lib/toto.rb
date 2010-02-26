@@ -1,5 +1,5 @@
 require 'yaml'
-require 'time'
+require 'date'
 require 'erb'
 require 'rack'
 require 'digest'
@@ -235,7 +235,7 @@ module Toto
 
       self.taint
       self.update data
-      self[:date] = Time.parse(self[:date].gsub('/', '-')) rescue Time.now
+      self[:date] = Date.parse(self[:date].gsub('/', '-')) rescue Date.today
       self
     end
 
