@@ -228,7 +228,10 @@ module Toto
     def load
       data = if @obj.is_a? String
         meta, self[:body] = File.read(@obj).split(/\n\n/, 2)
-        YAML.load(meta)
+
+        # use the date from the filename, or else toto won't find the article
+        @obj =~ /\/(\d{4}-\d{2}-\d{2})[^\/]*$/
+        $1 ? YAML.load(meta).merge("date" => $1) : YAML.load(meta)
       elsif @obj.is_a? Hash
         @obj
       end.inject({}) {|h, (k,v)| h.merge(k.to_sym => v) }
