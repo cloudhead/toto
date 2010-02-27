@@ -1,4 +1,5 @@
 require 'test/test_helper'
+require 'date'
 
 URL = "http://toto.oz"
 AUTHOR = "toto"
@@ -136,11 +137,11 @@ context Toto do
       should("have a title")               { topic.title }.equals "Toto & The Wizard of Oz."
       should("parse the body as markdown") { topic.body }.equals "<h1>Chapter I</h1>\n\n<p>hello, <em>stranger</em>.</p>\n"
       should("create an appropriate slug") { topic.slug }.equals "toto-and-the-wizard-of-oz"
-      should("set the date")               { topic.date }.equals "the time is #{Time.now.strftime("%Y/%m/%d %H:%M")}"
+      should("set the date")               { topic.date }.equals "the time is #{Date.today.strftime("%Y/%m/%d %H:%M")}"
       should("create a summary")           { topic.summary == topic.body }
       should("have an author")             { topic.author }.equals AUTHOR
-      should("have a path")                { topic.path }.equals Time.now.strftime("/%Y/%m/%d/toto-and-the-wizard-of-oz/")
-      should("have a url")                 { topic.url }.equals Time.now.strftime("#{URL}/%Y/%m/%d/toto-and-the-wizard-of-oz/")
+      should("have a path")                { topic.path }.equals Date.today.strftime("/%Y/%m/%d/toto-and-the-wizard-of-oz/")
+      should("have a url")                 { topic.url }.equals Date.today.strftime("#{URL}/%Y/%m/%d/toto-and-the-wizard-of-oz/")
     end
 
     context "with a user-defined summary" do
