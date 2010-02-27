@@ -143,7 +143,7 @@ module Toto
     end
 
     def self.articles ext
-      Dir["#{Paths[:articles]}/*.#{ext}"].sort_by { |file_name| File.basename(file_name) }
+      Dir["#{Paths[:articles]}/*.#{ext}"].sort_by {|entry| File.basename(entry) }
     end
 
     class Context
