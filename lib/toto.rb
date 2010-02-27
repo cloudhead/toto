@@ -231,7 +231,7 @@ module Toto
 
         # use the date from the filename, or else toto won't find the article
         @obj =~ /\/(\d{4}-\d{2}-\d{2})[^\/]*$/
-        $1 ? YAML.load(meta).merge("date" => $1) : YAML.load(meta)
+        ($1 ? {:date => $1} : {}).merge(YAML.load(meta))
       elsif @obj.is_a? Hash
         @obj
       end.inject({}) {|h, (k,v)| h.merge(k.to_sym => v) }
