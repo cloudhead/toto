@@ -206,6 +206,11 @@ context Toto do
 
     should("set the value to a proc") { topic[:to_html] }.respond_to :call
   end
+
+  context "extensions to the core Ruby library" do
+
+    should("respond to iso8601") { Date.today }.respond_to?(:iso8601)
+  end
 end
 
 
