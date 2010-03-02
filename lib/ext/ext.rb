@@ -35,7 +35,7 @@ class Fixnum
   end
 end
 
-def Date
+class Date
   # This check is for people running Toto with ActiveSupport, avoid a collision
   unless respond_to? :iso8601
     # Return the date as a String formatted according to ISO 8601.
