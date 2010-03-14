@@ -128,7 +128,7 @@ module Toto
   protected
 
     def http code
-      return ["<font style='font-size:300%'>toto, we're not in Kansas anymore (#{code})</font>", code]
+      return [@config[:error_page].call(code), code]
     end
 
     def articles
@@ -289,6 +289,9 @@ module Toto
       :github => {:user => "", :repos => [], :ext => 'md'}, # Github username and list of repos
       :to_html => lambda {|path, page, ctx|                 # returns an html, from a path & context
         ERB.new(File.read("#{path}/#{page}.rhtml")).result(ctx)
+      },
+      :error_page => lambda {|code|                         # The HTML for your error page
+        "<font style='font-size:300%'>toto, we're not in Kansas anymore (#{code})</font>"
       }
     }
     def initialize obj
