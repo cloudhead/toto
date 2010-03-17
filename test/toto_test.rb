@@ -42,6 +42,7 @@ context Toto do
       asserts("content type is set properly") { topic.content_type }.equals "text/html"
       should("include a couple of article")   { topic.body }.includes_elements("#articles li", 3)
       should("include an archive")            { topic.body }.includes_elements("#archives li", 2)
+      asserts("Etag header present")          { topic.headers["Etag"] }
     end
   end
 
