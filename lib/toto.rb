@@ -169,7 +169,7 @@ module Toto
       alias :to_atom to_xml
 
       def method_missing m, *args, &blk
-        @context.respond_to?(m) ? @context.send(m) : super
+        @context.respond_to?(m) ? @context.send(m, *args, &blk) : super
       end
     end
   end
