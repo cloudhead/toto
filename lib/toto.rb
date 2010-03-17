@@ -66,17 +66,10 @@ module Toto
     end
 
     def index type = :html
-      case type
-        when :html
-          {:articles => self.articles.reverse.map do |article|
-              Article.new article, @config
-          end }.merge archives
-        when :xml, :json
-          return :articles => self.articles.map do |article|
-            Article.new article, @config
-          end
-        else return {}
-      end
+      articles = type == :html ? self.articles.reverse : self.articles
+      {:articles => articles.map do |article|
+        Article.new article, @config
+      end}.merge archives
     end
 
     def archives filter = ""
