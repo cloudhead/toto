@@ -7,7 +7,6 @@ require 'open-uri'
 
 require 'rdiscount'
 require 'builder'
-require 'pp'
 
 $:.unshift File.dirname(__FILE__)
 
@@ -165,7 +164,6 @@ module Toto
 
       def to_xml page
         xml = Builder::XmlMarkup.new(:indent => 2)
-        pp page
         instance_eval File.read("#{Paths[:templates]}/#{page}.builder")
       end
       alias :to_atom to_xml
