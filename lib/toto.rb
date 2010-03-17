@@ -311,11 +311,12 @@ module Toto
   end
 
   class Server
-    attr_reader :config
+    attr_reader :config, :site
 
     def initialize config = {}, &blk
       @config = config.is_a?(Config) ? config : Config.new(config)
       @config.instance_eval(&blk) if block_given?
+      @site = Toto::Site.new(@config)
     end
 
     def call env
@@ -327,7 +328,7 @@ module Toto
       path, mime = @request.path_info.split('.')
       route = (path || '/').split('/').reject {|i| i.empty? }
 
-      response = Toto::Site.new(@config).go(route, *(mime ? mime : []))
+      response = @site.go(route, *(mime ? mime : []))
 
       @response.body = [response[:body]]
       @response['Content-Length'] = response[:body].length.to_s unless response[:body].empty?
