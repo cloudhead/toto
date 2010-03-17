@@ -68,7 +68,7 @@ One would then edit the template at will, it has the following structure:
     |
     +- layout.rhtml      # the main site layout, shared by all pages
     |
-    +- feed.builder      # the builder template for the atom feed
+    +- index.builder     # the builder template for the atom feed
     |
     +- pages/            # pages, such as home, about, etc go here
        |
