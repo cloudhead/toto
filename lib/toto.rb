@@ -266,7 +266,7 @@ module Toto
 
     def title()   self[:title] || "an article"               end
     def date()    @config[:date].call(self[:date])           end
-    def path()    self[:date].strftime("/%Y/%m/%d/#{slug}/") end
+    def path()    self[:date].strftime(@config[:path_prefix] + "/%Y/%m/%d/#{slug}/") end
     def author()  self[:author] || @config[:author]          end
     def to_html() self.load; super(:article, @config)        end
 
@@ -279,7 +279,8 @@ module Toto
       :author => ENV['USER'],                               # blog author
       :title => Dir.pwd.split('/').last,                    # site title
       :root => "index",                                     # site index
-      :url => "http://127.0.0.1",
+      :url => "http://127.0.0.1",                           # root URL of the site
+      :path_prefix => "",                                   # common path prefix for the blog
       :date => lambda {|now| now.strftime("%d/%m/%Y") },    # date function
       :markdown => :smart,                                  # use markdown
       :disqus => false,                                     # disqus name

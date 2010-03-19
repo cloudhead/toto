@@ -132,17 +132,18 @@ create a heroku app with `heroku create`, and push with `git push heroku master`
 You can configure toto, by modifying the _config.ru_ file. For example, if you want to set the blog author to 'John Galt',
 you could add `set :author, 'John Galt'` inside the `Toto::Server.new` block. Here are the defaults, to get you started: 
 
-    set :author,    ENV['USER']                               # blog author 
-    set :title,     Dir.pwd.split('/').last                   # site title
-    set :url,       'http://example.com'                      # site root URL
-    set :root,      "index"                                   # page to load on / 
-    set :date,      lambda {|now| now.strftime("%d/%m/%Y") }  # date format for articles 
-    set :markdown,  :smart                                    # use markdown + smart-mode 
-    set :disqus,    false                                     # disqus id, or false 
-    set :summary,   :max => 150, :delim => /~\n/              # length of article summary and delimiter 
-    set :ext,       'txt'                                     # file extension for articles 
-    set :cache,     28800                                     # cache site for 8 hours
-    set :to_html do |path, page, ctx|                         # returns an html, from a path & context
+    set :author,      ENV['USER']                               # blog author 
+    set :title,       Dir.pwd.split('/').last                   # site title
+    set :url,         'http://example.com'                      # site root URL
+    set :path_prefix, ''                                        # common path prefix for all pages (suffix to :url)
+    set :root,        "index"                                   # page to load on / 
+    set :date,        lambda {|now| now.strftime("%d/%m/%Y") }  # date format for articles 
+    set :markdown,    :smart                                    # use markdown + smart-mode 
+    set :disqus,      false                                     # disqus id, or false 
+    set :summary,     :max => 150, :delim => /~\n/              # length of article summary and delimiter 
+    set :ext,         'txt'                                     # file extension for articles 
+    set :cache,       28800                                     # cache site for 8 hours
+    set :to_html   do |path, page, ctx|                         # returns an html, from a path & context
         ERB.new(File.read("#{path}/#{page}.rhtml")).result(ctx)
     end
 
