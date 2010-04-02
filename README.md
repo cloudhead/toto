@@ -58,7 +58,7 @@ synopsis
 
 One would start by installing _toto_, with `sudo gem install toto`, and then forking or
 cloning the `dorothy` repo, to get a basic skeleton:
-    
+
     $ git clone git://github.com/cloudhead/dorothy.git weblog
     $ cd weblog/
 
@@ -84,11 +84,11 @@ One could then create a .txt article file in the `articles/` folder, and make su
     author: Lyman Frank Baum
     date: 1900/05/17
 
-    Dorothy lived in the midst of the great Kansas prairies, with Uncle Henry, 
+    Dorothy lived in the midst of the great Kansas prairies, with Uncle Henry,
     who was a farmer, and Aunt Em, who was the farmer's wife.
-  
+
 If one is familiar with webby or aerial, this shouldn't look funny. Basically the top of the file is in YAML format,
-and the rest of it is the blog post. They are delimited by an empty line `/\n\n/`, as you can see above. 
+and the rest of it is the blog post. They are delimited by an empty line `/\n\n/`, as you can see above.
 None of the information is compulsory, but it's strongly encouraged you specify it.
 Note that one can also use `rake` to create an article stub, with `rake new`.
 
@@ -106,7 +106,7 @@ Toto is built on top of **Rack**, and hence has a **rackup** file: _config.ru_.
 
 #### on your own server
 
-Once you have created the remote git repo, and pushed your changes to it, you can run toto with any Rack compliant web server, 
+Once you have created the remote git repo, and pushed your changes to it, you can run toto with any Rack compliant web server,
 such as **thin**, **mongrel** or **unicorn**.
 
 With thin, you would do something like:
@@ -119,8 +119,8 @@ With unicorn, you can just do:
 
 #### on heroku
 
-Toto was designed to work well with [heroku](http://heroku.com), it makes the most out of it's state-of-the-art caching, 
-by setting the _Cache-Control_ and _Etag_ HTTP headers. Deploying on Heroku is really easy, just get the heroku gem, 
+Toto was designed to work well with [heroku](http://heroku.com), it makes the most out of it's state-of-the-art caching,
+by setting the _Cache-Control_ and _Etag_ HTTP headers. Deploying on Heroku is really easy, just get the heroku gem,
 create a heroku app with `heroku create`, and push with `git push heroku master`.
 
     $ heroku create weblog
@@ -130,21 +130,26 @@ create a heroku app with `heroku create`, and push with `git push heroku master`
 ### configuration
 
 You can configure toto, by modifying the _config.ru_ file. For example, if you want to set the blog author to 'John Galt',
-you could add `set :author, 'John Galt'` inside the `Toto::Server.new` block. Here are the defaults, to get you started: 
+you could add `set :author, 'John Galt'` inside the `Toto::Server.new` block. Here are the defaults, to get you started:
 
-    set :author,      ENV['USER']                               # blog author 
+    set :author,      ENV['USER']                               # blog author
     set :title,       Dir.pwd.split('/').last                   # site title
     set :url,         'http://example.com'                      # site root URL
-    set :path_prefix, ''                                        # common path prefix for all pages (suffix to :url)
-    set :root,        "index"                                   # page to load on / 
-    set :date,        lambda {|now| now.strftime("%d/%m/%Y") }  # date format for articles 
-    set :markdown,    :smart                                    # use markdown + smart-mode 
-    set :disqus,      false                                     # disqus id, or false 
-    set :summary,     :max => 150, :delim => /~\n/              # length of article summary and delimiter 
-    set :ext,         'txt'                                     # file extension for articles 
+    set :prefix,      ''                                        # common path prefix for all pages
+    set :root,        "index"                                   # page to load on /
+    set :date,        lambda {|now| now.strftime("%d/%m/%Y") }  # date format for articles
+    set :markdown,    :smart                                    # use markdown + smart-mode
+    set :disqus,      false                                     # disqus id, or false
+    set :summary,     :max => 150, :delim => /~\n/              # length of article summary and delimiter
+    set :ext,         'txt'                                     # file extension for articles
     set :cache,       28800                                     # cache site for 8 hours
+
     set :to_html   do |path, page, ctx|                         # returns an html, from a path & context
-        ERB.new(File.read("#{path}/#{page}.rhtml")).result(ctx)
+      ERB.new(File.read("#{path}/#{page}.rhtml")).result(ctx)
+    end
+
+    set :error     do |code|                                    # The HTML for your error page
+      "<font style='font-size:300%'>toto, we're not in Kansas anymore (#{code})</font>"
     end
 
 thanks
@@ -154,4 +159,4 @@ To heroku for making this easy as pie.
 To adam wiggins, as I stole a couple of ideas from Scanty.
 To the developpers of Rack, for making such an awesome platform.
 
-Copyright (c) 2009 cloudhead. See LICENSE for details.
+Copyright (c) 2009-2010 cloudhead. See LICENSE for details.
