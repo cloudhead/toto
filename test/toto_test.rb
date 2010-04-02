@@ -42,7 +42,8 @@ context Toto do
       asserts("content type is set properly") { topic.content_type }.equals "text/html"
       should("include a couple of article")   { topic.body }.includes_elements("#articles li", 3)
       should("include an archive")            { topic.body }.includes_elements("#archives li", 2)
-      asserts("Etag header present")          { topic.headers["Etag"] }
+      asserts("Etag header present")          { topic.headers.include? "ETag" }
+      asserts("Etag header has a value")      { not topic.headers["ETag"].empty? }
     end
   end
 
@@ -209,7 +210,6 @@ context Toto do
   end
 
   context "extensions to the core Ruby library" do
-
     should("respond to iso8601") { Date.today }.respond_to?(:iso8601)
   end
 end
