@@ -128,7 +128,7 @@ module Toto
   protected
 
     def http code
-      return [@config[:error_page].call(code), code]
+      [@config[:error].call(code), code]
     end
 
     def articles
@@ -264,14 +264,15 @@ module Toto
       markdown self[:body].sub(@config[:summary][:delim], '') rescue markdown self[:body]
     end
 
+    def path
+      @config[:prefix] + self[:date].strftime("/%Y/%m/%d/#{slug}/")
+    end
+
     def title()   self[:title] || "an article"               end
     def date()    @config[:date].call(self[:date])           end
-    def path()    self[:date].strftime(@config[:path_prefix] + "/%Y/%m/%d/#{slug}/") end
     def author()  self[:author] || @config[:author]          end
     def to_html() self.load; super(:article, @config)        end
-
     alias :to_s to_html
-
   end
 
   class Config < Hash
@@ -280,7 +281,7 @@ module Toto
       :title => Dir.pwd.split('/').last,                    # site title
       :root => "index",                                     # site index
       :url => "http://127.0.0.1",                           # root URL of the site
-      :path_prefix => "",                                   # common path prefix for the blog
+      :prefix => "",                                        # common path prefix for the blog
       :date => lambda {|now| now.strftime("%d/%m/%Y") },    # date function
       :markdown => :smart,                                  # use markdown
       :disqus => false,                                     # disqus name
@@ -291,7 +292,7 @@ module Toto
       :to_html => lambda {|path, page, ctx|                 # returns an html, from a path & context
         ERB.new(File.read("#{path}/#{page}.rhtml")).result(ctx)
       },
-      :error_page => lambda {|code|                         # The HTML for your error page
+      :error => lambda {|code|                              # The HTML for your error page
         "<font style='font-size:300%'>toto, we're not in Kansas anymore (#{code})</font>"
       }
     }
