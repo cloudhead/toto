@@ -186,6 +186,19 @@ context Toto do
         should("create a valid summary") { topic.summary.size }.within 75..80
       end
     end
+
+    context "in a subdirectory" do
+      setup do
+        conf = Toto::Config.new({})
+        conf.set(:prefix, "blog")
+        Toto::Article.new({
+          :title => "Toto & The Wizard of Oz.",
+          :body => "#Chapter I\nhello, *stranger*."
+        }, conf)
+      end
+
+      should("be in the directory") { topic.path }.equals Date.today.strftime("/blog/%Y/%m/%d/toto-and-the-wizard-of-oz/")
+    end
   end
 
   context "using Config#set with a hash" do
@@ -207,6 +220,18 @@ context Toto do
     end
 
     should("set the value to a proc") { topic[:to_html] }.respond_to :call
+  end
+
+  context "testing individual configuration parameters" do
+    context "generate error pages" do
+      setup do
+        conf = Toto::Config.new({})
+        conf.set(:error) {|code| "error code #{code}" }
+        conf
+      end
+
+      should("create an error page") { topic[:error].call(400) }.equals "error code 400"
+    end
   end
 
   context "extensions to the core Ruby library" do
