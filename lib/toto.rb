@@ -265,7 +265,7 @@ module Toto
     end
 
     def path
-      @config[:prefix] + self[:date].strftime("/%Y/%m/%d/#{slug}/")
+      "/#{@config[:prefix]}#{self[:date].strftime("/%Y/%m/%d/#{slug}/")}".squeeze('/')
     end
 
     def title()   self[:title] || "an article"               end
