@@ -80,9 +80,14 @@ context Toto do
     end
   end
 
-  context "GET to an unknown route" do
-    setup { @toto.get('/unknown') }
+  context "GET to an unknown route with a custom error" do
+    setup do
+      @config[:error] = lambda {|code| "error: #{code}" }
+      @toto.get('/unknown')
+    end
+
     should("returns a 404") { topic.status }.equals 404
+    should("return the custom error") { topic.body }.equals "error: 404"
   end
 
   context "Request is invalid" do
