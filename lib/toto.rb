@@ -341,7 +341,7 @@ module Toto
         "no-cache, must-revalidate"
       end
 
-      @response['ETag'] = Digest::SHA1.hexdigest(response[:body])
+      @response['ETag'] = %("#{Digest::SHA1.hexdigest(response[:body])}")
 
       @response.status = response[:status]
       @response.finish
