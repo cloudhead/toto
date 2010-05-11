@@ -5,7 +5,13 @@ require 'rack'
 require 'digest'
 require 'open-uri'
 
-require 'rdiscount'
+if RUBY_PLATFORM =~ /win32/
+  require 'maruku'
+  Markdown = Maruku
+else
+  require 'rdiscount'
+end
+
 require 'builder'
 
 $:.unshift File.dirname(__FILE__)

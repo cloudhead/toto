@@ -13,7 +13,11 @@ begin
     gem.add_development_dependency "riot"
     gem.add_dependency "builder"
     gem.add_dependency "rack"
-    gem.add_dependency "rdiscount"
+    if RUBY_PLATFORM =~ /win32/
+      gem.add_dependency "maruku"
+    else
+      gem.add_dependency "rdiscount"
+    end
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
