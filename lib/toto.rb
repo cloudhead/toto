@@ -97,11 +97,11 @@ module Toto
       self[:root]
     end
 
-    def go route, type = :html
+    def go route, type = :html, env
       route << self./ if route.empty?
       type, path = type =~ /html|xml|json/ ? type.to_sym : :html, route.join('/')
       context = lambda do |data, page|
-        Context.new(data, @config, path).render(page, type)
+        Context.new(data, @config, path, env).render(page, type)
       end
 
       body, status = if Context.new.respond_to?(:"to_#{type}")
@@ -147,9 +147,10 @@ module Toto
 
     class Context
       include Template
+      attr_reader :env
 
-      def initialize ctx = {}, config = {}, path = "/"
-        @config, @context, @path = config, ctx, path
+      def initialize ctx = {}, config = {}, path = "/", env
+        @config, @context, @path, @env = config, ctx, path, env
         @articles = Site.articles(@config[:ext]).reverse.map do |a|
           Article.new(a, @config)
         end
@@ -334,7 +335,7 @@ module Toto
       path, mime = @request.path_info.split('.')
       route = (path || '/').split('/').reject {|i| i.empty? }
 
-      response = @site.go(route, *(mime ? mime : []))
+      response = @site.go(route, *(mime ? mime : []), env)
 
       @response.body = [response[:body]]
       @response['Content-Length'] = response[:body].length.to_s unless response[:body].empty?
