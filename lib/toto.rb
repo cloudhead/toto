@@ -149,7 +149,7 @@ module Toto
       include Template
       attr_reader :env
 
-      def initialize ctx = {}, config = {}, path = "/", env
+      def initialize ctx = {}, config = {}, path = "/", env = {}
         @config, @context, @path, @env = config, ctx, path, env
         @articles = Site.articles(@config[:ext]).reverse.map do |a|
           Article.new(a, @config)
