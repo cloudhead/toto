@@ -56,7 +56,9 @@ It also includes a _.gems_ file, for heroku.
 synopsis
 --------
 
-One would start by installing _toto_, with `sudo gem install toto`, and then forking or
+Disclaimer: this is just a fork of the main toto branch - I made it accessible to the public since I needed a repository heroku could access. After the main toto branch will feature <code>env>/code>-access, this branch will be obsolete. Until then: enjoy ;-)!
+
+One would start by installing _toto_prerelease_, with `sudo gem install toto_prerelease`, and then forking or
 cloning the `dorothy` repo, to get a basic skeleton:
 
     $ git clone git://github.com/cloudhead/dorothy.git weblog
