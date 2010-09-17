@@ -102,6 +102,13 @@ context Toto do
     asserts("summary shouldn't be empty")   { topic.body }.includes_html("summary" => /.{10,}/)
   end
 
+  context "GET /custom.xml (custom XML)" do
+    setup { @toto.get('/custom.xml') }
+    asserts("content type is set properly") { topic.content_type }.equals "application/xml"
+    asserts("body should be valid xml")     { topic.body }.includes_html("custom > child" => /.+/)
+    asserts("summary shouldn't be empty")   { topic.body }.includes_html("name" => /.{10,}/)
+  end
+
   context "GET to a repo name" do
     setup do
       class Toto::Repo
