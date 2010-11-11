@@ -184,7 +184,7 @@ module Toto
   class Repo < Hash
     include Template
 
-    README = "http://github.com/%s/%s/raw/master/README.%s"
+    README = "https://github.com/%s/%s/raw/master/README.%s"
 
     def initialize name, config
       self[:name], @config = name, config
