@@ -97,7 +97,7 @@ module Toto
       self[:root]
     end
 
-    def go route, type = :html, env
+    def go route, type = :html, env = {}
       route << self./ if route.empty?
       type, path = type =~ /html|xml|json/ ? type.to_sym : :html, route.join('/')
       context = lambda do |data, page|
