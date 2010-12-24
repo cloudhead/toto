@@ -6,7 +6,7 @@ the tiniest blogging engine in Oz!
 introduction
 ------------
 
-toto is a git-powered, minimalist blog engine for the hackers of Oz. The engine weighs around ~300 sloc at its worse.
+toto is a git-powered, minimalist blog engine for the hackers of Oz. The engine weighs around ~300 sloc at its worst.
 There is no toto client, at least for now; everything goes through git.
 
 blog in 10 seconds
