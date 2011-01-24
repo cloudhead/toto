@@ -31,6 +31,7 @@ Gem::Specification.new do |s|
      "test/articles/2009-04-01-tilt-factor.txt",
      "test/articles/2009-12-04-some-random-article.txt",
      "test/articles/2009-12-11-the-dichotomy-of-design.txt",
+     "test/articles/2011-01-24-damage.txt",
      "test/autotest.rb",
      "test/templates/about.rhtml",
      "test/templates/archives.rhtml",
