@@ -56,7 +56,7 @@ It also includes a _.gems_ file, for heroku.
 synopsis
 --------
 
-One would start by installing _toto_, with `gem install toto`, and then forking or
+One would start by installing _toto_, with `sudo gem install toto`, and then forking or
 cloning the `dorothy` repo, to get a basic skeleton:
 
     $ git clone git://github.com/cloudhead/dorothy.git weblog
