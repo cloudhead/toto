@@ -1,4 +1,4 @@
-require 'test/test_helper'
+require 'test_helper'
 require 'date'
 
 URL = "http://toto.oz"
