@@ -4,12 +4,12 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = %q{toto_prerelease}
-  s.version = "0.4.7prerelease"
+  s.name = %q{toto}
+  s.version = "0.4.9"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.authors = ["cloudhead", "Sven Kräuter"]
-  s.date = %q{2010-05-11}
+  s.authors = ["cloudhead"]
+  s.date = %q{2010-12-01}
   s.description = %q{the tiniest blog-engine in Oz.}
   s.email = %q{self@cloudhead.net, mail@5v3n.com}
   s.extra_rdoc_files = [

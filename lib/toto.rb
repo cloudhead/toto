@@ -97,7 +97,7 @@ module Toto
       self[:root]
     end
 
-    def go route, env, type = :html
+    def go route, env = {}, type = :html
       route << self./ if route.empty?
       type, path = type =~ /html|xml|json/ ? type.to_sym : :html, route.join('/')
       context = lambda do |data, page|
@@ -184,7 +184,7 @@ module Toto
   class Repo < Hash
     include Template
 
-    README = "http://github.com/%s/%s/raw/master/README.%s"
+    README = "https://github.com/%s/%s/raw/master/README.%s"
 
     def initialize name, config
       self[:name], @config = name, config
