@@ -92,7 +92,17 @@ module Toto
     def article route
       Article.new("#{Paths[:articles]}/#{route.join('-')}.#{self[:ext]}", @config).load
     end
-
+    
+    def tagged tag
+      articles = self.articles.collect do |article|
+        Article.new article, @config
+      end.select do |article|
+        !article[:tags].index(tag.humanize).nil?
+      end
+      
+      {:articles => articles, :tag => tag}
+    end
+    
     def /
       self[:root]
     end
@@ -113,6 +123,8 @@ module Toto
               context[article(route), :article]
             else http 400
           end
+        elsif route.first == "tagged"
+          context[tagged(route.last), :tagged]
         elsif respond_to?(path)
           context[send(path, type), path.to_sym]
         elsif (repo = @config[:github][:repos].grep(/#{path}/).first) &&
@@ -236,9 +248,10 @@ module Toto
       elsif @obj.is_a? Hash
         @obj
       end.inject({}) {|h, (k,v)| h.merge(k.to_sym => v) }
-
+      
       self.taint
       self.update data
+      self[:tags] = self[:tags].split(',').collect{|tag| tag.strip.humanize }
       self[:date] = Date.parse(self[:date].gsub('/', '-')) rescue Date.today
       self
     end
@@ -274,12 +287,50 @@ module Toto
     def path
       "/#{@config[:prefix]}#{self[:date].strftime("/%Y/%m/%d/#{slug}/")}".squeeze('/')
     end
+    
+    def tags
+      self[:tags].collect {|tag| "<a href=\"/tagged/#{tag.slugize}\">#{tag}</a>" }.join(@config[:tag_separator])
+    end
 
     def title()   self[:title] || "an article"               end
     def date()    @config[:date].call(self[:date])           end
     def author()  self[:author] || @config[:author]          end
     def to_html() self.load; super(:article, @config)        end
     alias :to_s to_html
+  end
+  
+  class TagCloud < Hash
+    def initialize articles
+      # Count all article tags
+      articles.each do |article|
+        article[:tags].each do |word|
+          unless self.key? word
+            self[word] = 0
+          else
+            self[word] = self[word] + 1
+          end
+        end
+      end
+    end
+
+    def font_ratio
+      min, max = 1000000, -1000000
+      self.each_key do |word|
+        max = self[word] if self[word] > max
+        min = self[word] if self[word] < min
+      end
+      18.0 / (max - min)
+    end
+
+    def build
+      cloud = String.new
+      ratio = font_ratio
+      self.each_key do |word|
+        font_size = (9 + (self[word] * ratio))
+        cloud << %Q{<span><a href="#" style="font-size:#{font_size}pt;">#{word}</a></span> }
+      end
+      cloud
+    end
   end
 
   class Config < Hash
@@ -294,6 +345,7 @@ module Toto
       :disqus => false,                                     # disqus name
       :summary => {:max => 150, :delim => /~\n/},           # length of summary and delimiter
       :ext => 'txt',                                        # extension for articles
+      :tag_separator => ' ',                                # tag separator for articles
       :cache => 28800,                                      # cache duration (seconds)
       :github => {:user => "", :repos => [], :ext => 'md'}, # Github username and list of repos
       :to_html => lambda {|path, page, ctx|                 # returns an html, from a path & context
