@@ -164,6 +164,10 @@ module Toto
         @config[:title]
       end
 
+      def author
+	@config[:author]
+      end
+
       def render page, type
         content = to_html page, @config
         type == :html ? to_html(:layout, @config, &Proc.new { content }) : send(:"to_#{type}", page)
