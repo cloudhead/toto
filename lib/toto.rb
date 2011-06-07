@@ -165,7 +165,7 @@ module Toto
       end
 
       def author
-	@config[:author]
+        @config[:author]
       end
 
       def render page, type
