@@ -279,10 +279,10 @@ module Toto
       "/#{@config[:prefix]}#{self[:date].strftime("/%Y/%m/%d/#{slug}/")}".squeeze('/')
     end
 
-    def title() self[:title] || "an article" end
-    def date() @config[:date].call(self[:date]) end
-    def author() self[:author] || @config[:author] end
-    def to_html() self.load; super(:article, @config) end
+    def title()   self[:title] || "an article"               end
+    def date()    @config[:date].call(self[:date])           end
+    def author()  self[:author] || @config[:author]          end
+    def to_html() self.load; super(:article, @config)        end
     alias :to_s to_html
   end
 
@@ -291,8 +291,6 @@ module Toto
       :author => ENV['USER'],                               # blog author
       :title => Dir.pwd.split('/').last,                    # site title
       :root => "index",                                     # site index
-      :keywords => "",
-      :description => "",
       :url => "http://127.0.0.1",                           # root URL of the site
       :prefix => "",                                        # common path prefix for the blog
       :date => lambda {|now| now.strftime("%d/%m/%Y") },    # date function
