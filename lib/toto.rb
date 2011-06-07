@@ -4,7 +4,14 @@ require 'erb'
 require 'rack'
 require 'digest'
 require 'open-uri'
-require 'rdiscount'
+
+if RUBY_PLATFORM =~ /win32/
+  require 'maruku'
+  Markdown = Maruku
+else
+  require 'rdiscount'
+end
+
 require 'builder'
 
 $:.unshift File.dirname(__FILE__)
@@ -159,14 +166,6 @@ module Toto
 
       def author
 	@config[:author]
-      end
-
-      def keywords
-        @config[:keywords]
-      end
-      
-      def description
-        @config[:description]
       end
 
       def render page, type
