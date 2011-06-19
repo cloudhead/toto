@@ -1,0 +1,6 @@
+image: http://30.media.tumblr.com/tumblr_lmsovxnwmq1qa6fh7o1_500.png
+title: A model for improving names
+date: 30/06/2011
+
+A model for improving the names of variables, fields, interfaces, classes and namespaces in a system. Practise this and more in my course, [Agile Design: Beyond the Basics](http://www.jbrains.ca/training/agile-design-beyond-the-basics).
+

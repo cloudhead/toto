@@ -17,4 +17,10 @@ end
 
 group :test do
   gem "riot"
+  gem "rspec"
+  gem "autotest"
+  gem "autotest-growl"
+  gem "autotest-fsevent"
+  gem "nokogiri"
 end
+
