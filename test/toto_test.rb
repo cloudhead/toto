@@ -112,6 +112,16 @@ context Toto do
 
 
 
+  context "GET a tag page" do 
+    setup { @toto.get('/tags/wizards') }
+    asserts("returns a 200") { topic.status }.equals 200 
+    asserts("body is not empty") { not topic.body.empty? }
+    should("includes only the entries for that tag") { topic.body }.includes_elements("li.entry", 2)
+    should("has access to @tag") { topic.body }.includes_html("#tag" => /wizards/)
+  end
+
+
+
   context "GET to a repo name" do
     setup do
       class Toto::Repo

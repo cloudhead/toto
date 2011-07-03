@@ -1,4 +1,5 @@
 title: The Wonderful Wizard of Oz
+tags: wizards, wonderful
 date: 17/05/1900
 
 _Once upon a time_...
