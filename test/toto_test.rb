@@ -112,6 +112,22 @@ context Toto do
 
 
 
+  context "Article" do
+    context "without tags" do
+      setup { Toto::Article.new({ :body => "" }, @config) }
+      asserts("has tags property") { not topic[:tags].nil? }
+      asserts("which is an array") { topic[:tags].is_a? Array }
+      should("have empty tags") { topic.tags.length }.equals 0
+    end
+
+    context "with tags" do
+      setup { Toto::Article.new "#{Toto::Paths[:articles]}/1900-05-17-the-wonderful-wizard-of-oz.txt", @config }
+      asserts("has tags property") { !topic[:tags].nil? }
+      asserts("which is an array") { topic[:tags].is_a? Array }
+      should("have elements") { topic.tags.length }.equals 2
+    end
+  end
+
   context "GET a tag page" do 
     setup { @toto.get('/tags/oz-wizards') }
     asserts("returns a 200") { topic.status }.equals 200 
