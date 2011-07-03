@@ -93,9 +93,10 @@ module Toto
       entries.reverse!.map! { |filename| Article.new(filename, @config) }
 
       # entries: array of artices
-      if !(tag = opts[:tag]).nil?
+      if !(tag = opts.delete(:tag)).nil?
+        tag = opts[:tag] = tag.slugize
         entries.select! do |article|
-          !article[:tags].nil? && article[:tags].include?(tag)
+          !article[:tags].nil? && article[:tags].collect{|tag| tag.slugize}.include?(tag)
         end
       end
 
@@ -254,6 +255,7 @@ module Toto
 
       self.taint
       self.update data
+      self[:tags] = self[:tags].to_s.split(',') unless self[:tags].is_a? Enumerable
       self[:date] = Date.parse(self[:date].gsub('/', '-')) rescue Date.today
       self
     end
