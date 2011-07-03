@@ -78,15 +78,28 @@ module Toto
       end}.merge archives
     end
 
-    def archives filter = ""
-      entries = ! self.articles.empty??
-        self.articles.select do |a|
-          filter !~ /^\d{4}/ || File.basename(a) =~ /^#{filter}/
-        end.reverse.map do |article|
-          Article.new article, @config
-        end : []
+    def archives opts = {}
+      opts = {:filter => opts} if opts.is_a?(String)
+      entries = self.articles || []
 
-      return :archives => Archives.new(entries, @config)
+      # entries: array of filenames
+      if !(filter = opts[:filter]).nil?
+        entries.select! do |filename|
+          filter !~ /^\d{4}/ || File.basename(filename) =~ /^#{filter}/
+        end
+      end
+
+      # load entries
+      entries.reverse!.map! { |filename| Article.new(filename, @config) }
+
+      # entries: array of artices
+      if !(tag = opts[:tag]).nil?
+        entries.select! do |article|
+          !article[:tags].nil? && article[:tags].include?(tag)
+        end
+      end
+
+      opts.merge({:archives => Archives.new(entries, @config)})
     end
 
     def article route
@@ -113,6 +126,8 @@ module Toto
               context[article(route), :article]
             else http 400
           end
+        elsif route.first.to_sym == :tags
+          context[archives(:tag => route.last), :tag]
         elsif respond_to?(path)
           context[send(path, type), path.to_sym]
         elsif (repo = @config[:github][:repos].grep(/#{path}/).first) &&
