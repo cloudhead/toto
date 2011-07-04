@@ -292,6 +292,10 @@ module Toto
       "/#{@config[:prefix]}#{self[:date].strftime("/%Y/%m/%d/#{slug}/")}".squeeze('/')
     end
 
+    def tags
+      self[:tags]
+    end
+
     def title()   self[:title] || "an article"               end
     def date()    @config[:date].call(self[:date])           end
     def author()  self[:author] || @config[:author]          end
@@ -388,8 +392,8 @@ module Toto
 
       # get min/max bounds
       cnt = self.values.collect{|tag| tag[:count]}
-      min = cnt.min
-      max = cnt.max
+      min = cnt.min.to_i
+      max = cnt.max.to_i
 
       # get correction rate
       rate = (max - min) / 9 + 1
