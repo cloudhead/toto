@@ -21,6 +21,7 @@ context Toto do
     asserts("content type is set properly") { topic.content_type }.equals "text/html"
     should("include a couple of article")   { topic.body }.includes_elements("#articles li", 3)
     should("include an archive")            { topic.body }.includes_elements("#archives li", 2)
+    should("include couple of tags")        { topic.body }.includes_elements("#tags li", 3)
 
     context "with no articles" do
       setup { Rack::MockRequest.new(Toto::Server.new(@config.merge(:ext => 'oxo'))).get('/') }

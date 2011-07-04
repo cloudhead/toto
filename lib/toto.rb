@@ -163,13 +163,14 @@ module Toto
 
     class Context
       include Template
-      attr_reader :env
+      attr_reader :env, :tags
 
       def initialize ctx = {}, config = {}, path = "/", env = {}
         @config, @context, @path, @env = config, ctx, path, env
         @articles = Site.articles(@config[:ext]).reverse.map do |a|
           Article.new(a, @config)
         end
+        @tags = TagCloud.new(@articles)
 
         ctx.each do |k, v|
           meta_def(k) { ctx.instance_of?(Hash) ? v : ctx.send(k) }

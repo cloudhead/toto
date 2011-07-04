@@ -6,6 +6,13 @@
 <div id="archives">
   <%= archives[3...5] %>
 </div>
+<!-- testing tags -->
+<ul id="tags">
+  <% for tag in tags %>
+    <li><%= tag %></li>
+  <% end %>
+</ul>
+<div><%= tags %></div>
 <!-- testing env variable passing -->
 <p>env passed: <%= env != nil %><br/></p>
 <!-- testing get/post parameter passing -->
