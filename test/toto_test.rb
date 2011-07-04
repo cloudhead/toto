@@ -112,6 +112,25 @@ context Toto do
 
 
 
+  context "TagCloud nubes" do
+    setup do
+      tags = Toto::TagCloud.new([ Toto::Article.new(:tags => ['wizards', 'magic']),
+                                  Toto::Article.new(:tags => ['wizards', 'voodoo']),
+                                  Toto::Article.new(:tags => ['magic', 'black']),
+                                  Toto::Article.new(:tags => ['wizards', 'black']),
+                                  Toto::Article.new(:tags => ['wizards']),
+                                  Toto::Article.new(:tags => ['wizards']),
+                                  Toto::Article.new(:tags => ['wizards']),
+                                  Toto::Article.new(:tags => ['wizards']),
+                                  Toto::Article.new(:tags => ['wizards']),
+                                  Toto::Article.new(:tags => ['wizards']) ])
+    end
+
+    asserts("weight depends on amount of tag usage") { topic['wizards'][:weight] > topic['voodoo'][:weight] }
+    asserts("the most heaviest tag has weight of 8") { topic['wizards'][:weight] }.equals 8
+    asserts("the most lightest tag has weight of 0") { topic['voodoo'][:weight] }.equals 0
+  end
+
   context "Article" do
     context "without tags" do
       setup { Toto::Article.new({ :body => "" }, @config) }

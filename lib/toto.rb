@@ -371,5 +371,36 @@ module Toto
       @response.finish
     end
   end
+
+  class TagCloud < Hash
+    def initialize articles
+      # fill-in tags
+      articles.each do |article|
+        article.tags.each do |tag|
+          slug = tag.slugize
+          unless self.key? slug
+            self[slug] = {:count => 1, :name => tag}
+          else
+            self[slug][:count] += 1
+          end
+        end
+      end
+
+      # get min/max bounds
+      cnt = self.values.collect{|tag| tag[:count]}
+      min = cnt.min
+      max = cnt.max
+
+      # get correction rate
+      rate = (max - min) / 9 + 1
+
+      # calculate weight
+      self.each_value {|tag| tag[:weight] = (tag[:count] - min) / rate}
+    end
+
+    def [] key
+      super key.to_s.slugize
+    end
+  end
 end
 
