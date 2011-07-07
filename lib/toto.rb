@@ -259,7 +259,7 @@ module Toto
       else
         self[:body].match(/(.{1,#{length || config[:length] || config[:max]}}.*?)(\n|\Z)/m).to_s
       end
-      markdown(sum.length == self[:body].length ? sum : sum.strip.sub(/\.\Z/, '&hellip;'))
+      markdown(sum.length == body.length ? sum : sum.strip.sub(/\.\Z/, '&hellip;'))
     end
 
     def url
