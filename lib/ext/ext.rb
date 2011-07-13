@@ -14,6 +14,12 @@ class String
   def humanize
     self.capitalize.gsub(/[-_]+/, ' ')
   end
+
+  if RUBY_VERSION < "1.9"
+    def bytesize
+      size
+    end
+  end
 end
 
 class Fixnum
