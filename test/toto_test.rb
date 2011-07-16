@@ -60,7 +60,7 @@ context Toto do
     asserts("returns a 200")                { topic.status }.equals 200
     asserts("content type is set properly") { topic.content_type }.equals "text/html"
     should("contain the article")           { topic.body }.includes_html("p" => /<em>Once upon a time<\/em>/)
-    should("contain tags of article")       { topic.body }.includes_elements("#tags li", 2)
+    should("contain tags of article")       { topic.body }.includes_elements("#tags span", 2)
     should("contain tags cloud")            { topic.body }.includes_elements("#tags-cloud li", 3)
   end
 
