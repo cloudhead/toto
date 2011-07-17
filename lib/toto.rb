@@ -441,7 +441,7 @@ module Toto
 
     def snowball
       ball, ops = [], [:push, :unshift]
-      self.values.sort_by!{|nube| nube.count}.each do |nube|
+      self.values.sort_by!{|nube| nube.count}.reverse!.each do |nube|
         ball.send ops.rotate!.first, nube
       end
       ball

@@ -136,7 +136,7 @@ context Toto do
     context "as snowball" do
       setup { topic.snowball }
       asserts("is an array") { topic.is_a? Array }
-      should("have most heaviest tag in the middle") { topic.at(3).weight }.equals 8
+      should("have most heaviest tag in the middle") { topic.at(1).weight }.equals 8
     end
   end
 
