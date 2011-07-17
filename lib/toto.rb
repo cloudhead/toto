@@ -94,9 +94,9 @@ module Toto
 
       # entries: array of artices
       if !(tag = opts.delete(:tag)).nil?
-        tag = opts[:tag] = tag.slugize
+        opts[:tag] = Tag.new(tag, @config)
         entries.select! do |article|
-          !article[:tags].nil? && article[:tags].collect{|tag| tag.slugize}.include?(tag)
+          !article[:tags].nil? && !article[:tags].find{|tag| tag.slug == opts[:tag].slug}
         end
       end
 
@@ -170,7 +170,7 @@ module Toto
         @articles = Site.articles(@config[:ext]).reverse.map do |a|
           Article.new(a, @config)
         end
-        @tags_cloud = TagCloud.new(@articles)
+        @tags_cloud = TagCloud.new(@articles, @config)
 
         ctx.each do |k, v|
           meta_def(k) { ctx.instance_of?(Hash) ? v : ctx.send(k) }
@@ -258,6 +258,9 @@ module Toto
       self.update data
       self[:tags] = self[:tags].to_s.split(',') unless self[:tags].is_a? Enumerable
       self[:date] = Date.parse(self[:date].gsub('/', '-')) rescue Date.today
+
+      self[:tags].map!{|str| Tag.new(str, @config)}
+
       self
     end
 
@@ -377,23 +380,52 @@ module Toto
     end
   end
 
+  class Tag
+    attr_reader :title, :slug
+
+    def initialize title, config = {}
+      @config = config
+      @title = title.strip
+      @slug = Tag.slugize(title)
+    end
+
+    def to_s
+      @slug
+    end
+
+    def link
+      "http://#{(@config[:url].sub("http://", '') + "/tags/#{@slug}").squeeze('/')}"
+    end
+
+    def self.slugize obj
+      obj.to_s.strip.slugize
+    end
+  end
+
   class TagCloud < Hash
-    def initialize articles
+    class Nube < Tag
+      attr_accessor :count, :weight
+      def initialize tag, config
+        @count, @weight = 1, 0
+        super tag.title, config
+      end
+    end
+
+    def initialize articles, config = {}
       # fill-in tags
       articles.each do |article|
         article.tags.each do |tag|
-          tag.chomp!
-          slug = tag.slugize
-          unless self.key? slug
-            self[slug] = {:count => 1, :name => tag}
+          slug = tag.slug
+          unless self[tag.slug].nil?
+            self[tag.slug].count += 1
           else
-            self[slug][:count] += 1
+            self[tag.slug] = Nube.new(tag, config)
           end
         end
       end
 
       # get min/max bounds
-      cnt = self.values.collect{|tag| tag[:count]}
+      cnt = self.values.collect{|nube| nube.count}
       min = cnt.min.to_i
       max = cnt.max.to_i
 
@@ -401,11 +433,11 @@ module Toto
       rate = (max - min) / 9 + 1
 
       # calculate weight
-      self.each_value {|tag| tag[:weight] = (tag[:count] - min) / rate}
+      self.each_value {|nube| nube.weight = (nube.count - min) / rate}
     end
 
     def [] key
-      super key.to_s.slugize
+      super Tag.slugize(key)
     end
   end
 end

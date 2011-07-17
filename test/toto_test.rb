@@ -129,9 +129,9 @@ context Toto do
                                   Toto::Article.new(:tags => ['wizards']) ])
     end
 
-    asserts("weight depends on amount of tag usage") { topic['wizards'][:weight] > topic['voodoo'][:weight] }
-    asserts("the most heaviest tag has weight of 8") { topic['wizards'][:weight] }.equals 8
-    asserts("the most lightest tag has weight of 0") { topic['voodoo'][:weight] }.equals 0
+    asserts("weight depends on amount of tag usage") { topic['wizards'].weight > topic['voodoo'].weight }
+    asserts("the most heaviest tag has weight of 8") { topic['wizards'].weight }.equals 8
+    asserts("the most lightest tag has weight of 0") { topic['voodoo'].weight }.equals 0
   end
 
   context "Article" do
@@ -154,7 +154,7 @@ context Toto do
     setup { @toto.get('/tags/oz-wizards') }
     asserts("returns a 200") { topic.status }.equals 200 
     asserts("body is not empty") { not topic.body.empty? }
-    should("includes only the entries for that tag") { topic.body }.includes_elements("li.entry", 2)
+    should("includes only the entries for that tag") { topic.body }.includes_elements("#tagged-articles > li", 3)
     should("has access to @tag") { topic.body }.includes_html("#tag" => /oz-wizards/)
   end
 
