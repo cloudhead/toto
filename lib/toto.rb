@@ -96,7 +96,7 @@ module Toto
       if !(tag = opts.delete(:tag)).nil?
         opts[:tag] = Tag.new(tag, @config)
         entries.select! do |article|
-          !article[:tags].nil? && !article[:tags].find{|tag| tag.slug == opts[:tag].slug}
+          !article[:tags].nil? && article[:tags].find{|tag| tag.slug == opts[:tag].slug}
         end
       end
 

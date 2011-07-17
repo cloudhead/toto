@@ -160,7 +160,7 @@ context Toto do
     setup { @toto.get('/tag/oz-wizards') }
     asserts("returns a 200") { topic.status }.equals 200 
     asserts("body is not empty") { not topic.body.empty? }
-    should("includes only the entries for that tag") { topic.body }.includes_elements("#tagged-articles > li", 3)
+    should("includes only the entries for that tag") { topic.body }.includes_elements("#tagged-articles > li", 2)
     should("has access to @tag") { topic.body }.includes_html("#tag" => /oz-wizards/)
   end
 
