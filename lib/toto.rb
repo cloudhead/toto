@@ -394,7 +394,7 @@ module Toto
     end
 
     def link
-      "http://#{(@config[:url].sub("http://", '') + "/tags/#{@slug}").squeeze('/')}"
+      "http://#{(@config[:url].sub("http://", '') + "/tag/#{@slug}").squeeze('/')}"
     end
 
     def self.slugize obj
