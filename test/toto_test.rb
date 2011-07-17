@@ -150,8 +150,8 @@ context Toto do
     end
   end
 
-  context "GET /tags/oz-wizards (tagged aticles)" do 
-    setup { @toto.get('/tags/oz-wizards') }
+  context "GET /tag/oz-wizards (tagged aticles)" do
+    setup { @toto.get('/tag/oz-wizards') }
     asserts("returns a 200") { topic.status }.equals 200 
     asserts("body is not empty") { not topic.body.empty? }
     should("includes only the entries for that tag") { topic.body }.includes_elements("#tagged-articles > li", 3)

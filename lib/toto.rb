@@ -127,7 +127,7 @@ module Toto
               context[article(route), :article]
             else http 400
           end
-        elsif route.first.to_sym == :tags
+        elsif route.first.to_sym == :tag
           context[archives(:tag => route.last), :tag]
         elsif respond_to?(path)
           context[send(path, type), path.to_sym]
