@@ -386,7 +386,7 @@ module Toto
     def initialize title, config = {}
       @config = config
       @title = title.strip
-      @slug = Tag.slugize(title)
+      @slug = Tag.slugize(@title)
     end
 
     def to_s
@@ -415,7 +415,6 @@ module Toto
       # fill-in tags
       articles.each do |article|
         article.tags.each do |tag|
-          slug = tag.slug
           unless self[tag.slug].nil?
             self[tag.slug].count += 1
           else
