@@ -438,6 +438,14 @@ module Toto
     def [] key
       super Tag.slugize(key)
     end
+
+    def snowball
+      ball, ops = [], [:push, :unshift]
+      self.values.sort_by!{|nube| nube.count}.each do |nube|
+        ball.send ops.rotate!.first, nube
+      end
+      ball
+    end
   end
 end
 

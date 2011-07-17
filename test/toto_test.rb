@@ -132,6 +132,12 @@ context Toto do
     asserts("weight depends on amount of tag usage") { topic['wizards'].weight > topic['voodoo'].weight }
     asserts("the most heaviest tag has weight of 8") { topic['wizards'].weight }.equals 8
     asserts("the most lightest tag has weight of 0") { topic['voodoo'].weight }.equals 0
+
+    context "as snowball" do
+      setup { topic.snowball }
+      asserts("is an array") { topic.is_a? Array }
+      should("have most heaviest tag in the middle") { topic.at(3).weight }.equals 8
+    end
   end
 
   context "Article" do
