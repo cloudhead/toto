@@ -128,7 +128,8 @@ module Toto
             else http 400
           end
         elsif route.first.to_sym == :tag
-          context[archives(:tag => route.last), :tag]
+          if 2 == route.size then context[archives(:tag => route.last), :tag]
+          else http 400; end
         elsif respond_to?(path)
           context[send(path, type), path.to_sym]
         elsif (repo = @config[:github][:repos].grep(/#{path}/).first) &&
