@@ -110,6 +110,11 @@ context Toto do
     asserts("access the http parameter name value pair")           { topic.body }.includes_html("p" => /request name value pair: param=testparam/)
   end
 
+  context "GET / (baseurl)" do
+    setup { @toto.get('/')   }
+    asserts("access the http get parameter") { topic.body }.includes_html("p" => %r{baseurl: #{URL}})
+  end
+
 
 
   context "GET to a repo name" do
