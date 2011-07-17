@@ -393,8 +393,13 @@ module Toto
       @slug
     end
 
-    def link
-      "http://#{(@config[:url].sub("http://", '') + "/tag/#{@slug}").squeeze('/')}"
+    def url
+      "http://#{(@config[:url].sub("http://", '') + self.path).squeeze('/')}"
+    end
+    alias :permalink url
+
+    def path
+      "/tag/#{@slug}"
     end
 
     def self.slugize obj
