@@ -162,7 +162,7 @@ module Toto
           Article.new(a, @config)
         end
 
-        if DRAFT_ENV != Toto.env
+        unless DRAFT_ENV == Toto.env
           @articles.reject!{ |a| a.title.match(DRAFT_RE) }
         end
 
