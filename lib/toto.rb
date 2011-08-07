@@ -260,7 +260,7 @@ module Toto
     end
 
     def slug
-      self[:slug] || self[:title].slugize
+      self[:slug] || self[:title].gsub(DRAFT_RE, '').slugize
     end
 
     def summary length = nil
