@@ -19,7 +19,7 @@ $:.unshift File.dirname(__FILE__)
 require 'ext/ext'
 
 module Toto
-  DRAFT_RE = /^~DRAFT~/
+  DRAFT_RE = /^~DRAFT~ /
   DRAFT_ENV = 'development'
 
   Paths = {
