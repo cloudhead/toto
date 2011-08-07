@@ -282,11 +282,9 @@ context Toto do
   end
 
   context "on non-development environment" do
-    Toto.env = 'production'
-
     context "GET /" do
       setup { @toto.get('/') }
-      should("do not include ~DRAFT~ articles") { topic.body }.not_includes_html("li" => /~DRAFT~/)
+      should("not include ~DRAFT~ articles") { topic.body }.not_includes_html("li" => /~DRAFT~/)
     end
 
     context "GET a ~DRAFT~ article" do
@@ -298,10 +296,12 @@ context Toto do
   end
 
   context "on development environment" do
-    Toto.env = 'development'
-
     context "GET /" do
-      setup { @toto.get('/') }
+      setup do
+        Toto.env = 'development'
+        @toto.get('/')
+      end
+
       should("include ~DRAFT~ articles") { topic.body }.includes_html("li" => /~DRAFT~/)
     end
   end
