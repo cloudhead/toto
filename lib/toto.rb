@@ -19,6 +19,9 @@ $:.unshift File.dirname(__FILE__)
 require 'ext/ext'
 
 module Toto
+  DRAFT_RE = /^~DRAFT~ /
+  DRAFT_ENV = 'development'
+
   Paths = {
     :templates => "templates",
     :pages => "templates/pages",
@@ -75,6 +78,8 @@ module Toto
       articles = type == :html ? self.articles.reverse : self.articles
       {:articles => articles.map do |article|
         Article.new article, @config
+      end.reject do |article|
+        DRAFT_ENV != Toto.env && article.title.match(DRAFT_RE)
       end}.merge archives
     end
 
@@ -84,6 +89,8 @@ module Toto
           filter !~ /^\d{4}/ || File.basename(a) =~ /^#{filter}/
         end.reverse.map do |article|
           Article.new article, @config
+        end.reject do |article|
+          DRAFT_ENV != Toto.env && article.title.match(DRAFT_RE)
         end : []
 
       return :archives => Archives.new(entries, @config)
@@ -153,6 +160,10 @@ module Toto
         @config, @context, @path, @env = config, ctx, path, env
         @articles = Site.articles(@config[:ext]).reverse.map do |a|
           Article.new(a, @config)
+        end
+
+        unless DRAFT_ENV == Toto.env
+          @articles.reject!{ |a| a.title.match(DRAFT_RE) }
         end
 
         ctx.each do |k, v|
@@ -249,7 +260,7 @@ module Toto
     end
 
     def slug
-      self[:slug] || self[:title].slugize
+      self[:slug] || self[:title].gsub(DRAFT_RE, '').slugize
     end
 
     def summary length = nil

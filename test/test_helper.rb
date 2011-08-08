@@ -25,6 +25,21 @@ module Toto
     end
   end
 
+  class NotIncludesHTMLMacro < Riot::AssertionMacro
+    register :not_includes_html
+
+    def evaluate(actual, expected)
+      expected = expected.to_a.flatten
+      data = Hpricot.parse(actual)/expected.first
+
+      if !data.empty? and data.inner_html.match(expected.last)
+        fail("expected <#{expected.first}> to contain no #{expected.last}")
+      else
+        pass
+      end
+    end
+  end
+
   class IncludesElementsMacro < Riot::AssertionMacro
     register :includes_elements
 

@@ -1,4 +1,4 @@
-require 'test/test_helper'
+require 'test_helper'
 require 'date'
 
 URL = "http://toto.oz"
@@ -279,6 +279,31 @@ context Toto do
 
   context "extensions to the core Ruby library" do
     should("respond to iso8601") { Date.today }.respond_to?(:iso8601)
+  end
+
+  context "on non-development environment" do
+    context "GET /" do
+      setup { @toto.get('/') }
+      should("not include ~DRAFT~ articles") { topic.body }.not_includes_html("li" => /~DRAFT~/)
+    end
+
+    context "GET a ~DRAFT~ article" do
+      setup { @toto.get("/2011/08/07/the-beautiful-people") }
+      asserts("returns a 200")                { topic.status }.equals 200
+      asserts("content type is set properly") { topic.content_type }.equals "text/html"
+      should("contain the article")           { topic.body }.includes_html("h2" => /~DRAFT~/)
+    end
+  end
+
+  context "on development environment" do
+    context "GET /" do
+      setup do
+        Toto.env = 'development'
+        @toto.get('/')
+      end
+
+      should("include ~DRAFT~ articles") { topic.body }.includes_html("li" => /~DRAFT~/)
+    end
   end
 end
 
