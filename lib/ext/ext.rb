@@ -44,3 +44,11 @@ class Date
     end
   end
 end
+
+class Array
+  if RUBY_VERSION < "1.9"
+    def rotate!
+      self.push self.shift
+    end
+  end
+end

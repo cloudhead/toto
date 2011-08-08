@@ -84,7 +84,7 @@ module Toto
 
       # entries: array of filenames
       if !(filter = opts[:filter]).nil?
-        entries.select! do |filename|
+        entries = entries.select do |filename|
           filter !~ /^\d{4}/ || File.basename(filename) =~ /^#{filter}/
         end
       end
@@ -95,7 +95,7 @@ module Toto
       # entries: array of artices
       if !(tag = opts.delete(:tag)).nil?
         opts[:tag] = Tag.new(tag, @config)
-        entries.select! do |article|
+        entries = entries.select do |article|
           !article[:tags].nil? && article[:tags].find{|tag| tag.slug == opts[:tag].slug}
         end
       end
@@ -257,7 +257,7 @@ module Toto
 
       self.taint
       self.update data
-      self[:tags] = self[:tags].to_s.split(',') unless self[:tags].is_a? Enumerable
+      self[:tags] = self[:tags].to_s.split(',') unless self[:tags].is_a? Array
       self[:date] = Date.parse(self[:date].gsub('/', '-')) rescue Date.today
 
       self[:tags].map!{|str| Tag.new(str, @config)}
@@ -447,7 +447,7 @@ module Toto
 
     def snowball
       ball, ops = [], [:push, :unshift]
-      self.values.sort_by!{|nube| nube.count}.reverse!.each do |nube|
+      self.values.sort!{|a,b| b.count <=> a.count}.each do |nube|
         ball.send ops.rotate!.first, nube
       end
       ball
