@@ -79,7 +79,7 @@ module Toto
     end
 
     def archives opts = {}
-      opts = {:filter => opts} if opts.is_a?(String)
+      opts = {:filter => opts} unless opts.is_a?(Hash)
       entries = self.articles || []
 
       # entries: array of filenames
