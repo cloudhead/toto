@@ -200,16 +200,6 @@ context Toto do
 
         should("create a valid summary") { topic.summary.size }.within 75..80
       end
-
-      context "all non-alphanumeric characters" do
-        setup do
-            Toto::Article.new({
-            :title  => "Having fun with //Applescript/Bananascript// and Terminal.app///"
-            }, @config)
-        end
-
-        should("be replaced with single dash") { topic.slug }.equals "having-fun-with-applescript-bananascript-and-terminal-app"
-      end
     end
 
     context "in a subdirectory" do
@@ -289,6 +279,13 @@ context Toto do
 
   context "extensions to the core Ruby library" do
     should("respond to iso8601") { Date.today }.respond_to?(:iso8601)
+
+    context "String#sluggize" do
+      should("replace (\t|,|.|!|?|_|+|=) with -") { "a b,c.d!e?f_g+h=i".sluggize }.equals "a-b-c-d-e-f-g-h-i"
+      should("replace `&` with `-and-`") { "Thelma & Louise".sluggize }.equals "thelma-and-louise"
+      should("remove non-alphanumeric or special meaning chars") { "a^^b".sluggize }.equals "ab"
+      should("squeeze multiple dashes") { "a-^-^-b".sluggize }.equals "a-b"
+    end
   end
 end
 
