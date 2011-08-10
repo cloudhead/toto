@@ -1,4 +1,4 @@
-require 'test/test_helper'
+require 'test_helper'
 require 'date'
 
 URL = "http://toto.oz"
@@ -280,11 +280,11 @@ context Toto do
   context "extensions to the core Ruby library" do
     should("respond to iso8601") { Date.today }.respond_to?(:iso8601)
 
-    context "String#sluggize" do
-      should("replace (\t|,|.|!|?|_|+|=) with -") { "a b,c.d!e?f_g+h=i".sluggize }.equals "a-b-c-d-e-f-g-h-i"
-      should("replace `&` with `-and-`") { "Thelma & Louise".sluggize }.equals "thelma-and-louise"
-      should("remove non-alphanumeric or special meaning chars") { "a^^b".sluggize }.equals "ab"
-      should("squeeze multiple dashes") { "a-^-^-b".sluggize }.equals "a-b"
+    context "String#slugize" do
+      should("replace separators with -") { "a b,c.d!e?f_g+h=i".slugize }.equals "a-b-c-d-e-f-g-h-i"
+      should("replace `&` with `-and-`")  { "a&b".slugize }.equals "a-and-b"
+      should("remove non-alphanumeric")   { "a^b".slugize }.equals "ab"
+      should("squeeze multiple dashes")   { "a-^-^-b".slugize }.equals "a-b"
     end
   end
 end
