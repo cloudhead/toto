@@ -280,6 +280,22 @@ context Toto do
   context "extensions to the core Ruby library" do
     should("respond to iso8601") { Date.today }.respond_to?(:iso8601)
   end
+
+
+  context "Link references defined after summary" do
+    setup do
+      file = "#{Toto::Paths[:articles]}/2011-08-11-summary-references.txt"
+      conf = Toto::Config.new({:summary => {:delim => /~\n/}})
+      Toto::Article.new(file, conf).summary
+    end
+
+    should("has summary text") { topic =~ /Here we go!/ }
+    should("has no body text") { topic !~ /Here we go again!/ }
+    should("has links defined inside summary") { topic }.includes_html("a" => "link")
+    should("has links defined outside summary") { topic }.includes_html("a" => "references")
+    should("understand multiline reference definitions") { topic }.includes_html("a" => "summary")
+    should("respect multiline refrence definition") { topic =~ /Wiki article/ }
+  end
 end
 
 
