@@ -253,13 +253,23 @@ module Toto
     end
 
     def summary length = nil
-      config = @config[:summary]
-      sum = if self[:body] =~ config[:delim]
-        self[:body].split(config[:delim]).first
+      config, links = @config[:summary], []
+
+      # grab out all link references
+      text = self[:body].gsub(/^\[[^\]]+\]:.+(?:\n[\t ]+.*)?/){|str| links << str; ""}
+
+      # leave only summary text
+      text = if text =~ config[:delim]
+        text.split(config[:delim]).first
       else
-        self[:body].match(/(.{1,#{length || config[:length] || config[:max]}}.*?)(\n|\Z)/m).to_s
-      end
-      markdown(sum.length == self[:body].length ? sum : sum.strip.sub(/\.\Z/, '&hellip;'))
+        text.match(/(.{1,#{length || config[:length] || config[:max]}}.*?)(\n|\Z)/m).to_s
+      end.strip
+
+      # append hellip if needed
+      text = text.sub(/\.\Z/, '&hellip;') if text.length < self[:body].length
+
+      # append links and markdown summary
+      markdown(text << "\n" << links.join("\n").strip)
     end
 
     def url
