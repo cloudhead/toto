@@ -164,6 +164,11 @@ context Toto do
     should("has access to @tag") { topic.body }.includes_html("#tag" => /oz-wizards/)
   end
 
+  context "GET /tag/ (no tag specified)" do
+    setup { @toto.get('/tag/') }
+    asserts("returns a 400") { topic.status }.equals 400 
+  end
+
 
 
   context "GET to a repo name" do
