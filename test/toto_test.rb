@@ -104,7 +104,7 @@ context Toto do
 
     context "when articles are sorted" do
       setup { @toto.get('/2009/12/11') }
-      should("earliest time comes first") { topic.body }.includes_html("#article-0" => /something new/)
+      should("earliest time comes first") { topic.body }.includes_html("#article-1" => /another post/)
     end
   end
 
