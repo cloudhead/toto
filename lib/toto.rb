@@ -82,11 +82,11 @@ module Toto
       entries = ! self.articles.empty??
         self.articles.select do |a|
           filter !~ /^\d{4}/ || File.basename(a) =~ /^#{filter}/
-        end.reverse.map do |article|
+        end.map do |article|
           Article.new article, @config
         end.sort_by do |article|
           article[:date].strftime("%Y%m%d%H%M%S-#{article.slug}")
-        end : []
+        end.reverse : []
 
       return :archives => Archives.new(entries, @config)
     end
