@@ -84,6 +84,8 @@ module Toto
           filter !~ /^\d{4}/ || File.basename(a) =~ /^#{filter}/
         end.reverse.map do |article|
           Article.new article, @config
+        end.sort_by do |article|
+          article[:date].strftime("%Y%m%d%H%M%S-#{article.slug}")
         end : []
 
       return :archives => Archives.new(entries, @config)
@@ -151,9 +153,11 @@ module Toto
 
       def initialize ctx = {}, config = {}, path = "/", env = {}
         @config, @context, @path, @env = config, ctx, path, env
-        @articles = Site.articles(@config[:ext]).reverse.map do |a|
+        @articles = Site.articles(@config[:ext]).map do |a|
           Article.new(a, @config)
-        end
+        end.sort_by do |article|
+          article[:date].strftime("%Y%m%d%H%M%S-#{article.slug}")
+        end.reverse
 
         ctx.each do |k, v|
           meta_def(k) { ctx.instance_of?(Hash) ? v : ctx.send(k) }
