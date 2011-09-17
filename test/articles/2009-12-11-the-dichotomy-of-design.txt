@@ -1,5 +1,5 @@
-title: the wizard of oz
-date: 12/10/1932
+title: the dichotomy of design
+date: 11/12/2009 15:00
 
 Once upon a time...
 

@@ -1,5 +1,5 @@
 <h1><%= @path %></h1>
-<% for entry in archives %>
-  <li class="entry"><%= entry.title %></li>
+<% archives.each_with_index do |entry, idx| %>
+  <li id="article-<%= idx %>" class="entry"><%= entry.title %></li>
 <% end %>
 
