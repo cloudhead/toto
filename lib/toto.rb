@@ -103,7 +103,6 @@ module Toto
       context = lambda do |data, page|
         Context.new(data, @config, path, env).render(page, type)
       end
-
       body, status = if Context.new.respond_to?(:"to_#{type}")
         if route.first =~ /\d{4}/
           case route.size
@@ -272,7 +271,11 @@ module Toto
     end
 
     def path
-      "/#{@config[:prefix]}#{self[:date].strftime("/%Y/%m/%d/#{slug}/")}".squeeze('/')
+      if(@config[:suffix]=='/')
+        return "/#{@config[:prefix]}#{self[:date].strftime("/%Y/%m/%d/#{slug}/")}".squeeze('/')
+      else
+        return "/#{@config[:prefix]}#{self[:date].strftime("/%Y/%m/%d/#{slug}/")}".squeeze('/').chomp('/') + @config[:suffix]
+      end
     end
 
     def title()   self[:title] || "an article"               end
@@ -301,7 +304,8 @@ module Toto
       },
       :error => lambda {|code|                              # The HTML for your error page
         "<font style='font-size:300%'>toto, we're not in Kansas anymore (#{code})</font>"
-      }
+      },
+      :suffix => '/'
     }
     def initialize obj
       self.update Defaults
@@ -338,6 +342,7 @@ module Toto
       response = @site.go(route, env, *(mime ? mime : []))
 
       @response.body = [response[:body]]
+      @response.body << mime
       @response['Content-Length'] = response[:body].length.to_s unless response[:body].empty?
       @response['Content-Type']   = Rack::Mime.mime_type(".#{response[:type]}")
 
