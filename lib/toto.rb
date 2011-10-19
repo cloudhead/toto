@@ -279,9 +279,9 @@ module Toto
 
     def path
       if(@config[:suffix]=='/')
-        return "/#{@config[:prefix]}#{self[:date].strftime("/%Y/%m/#{slug}/")}".squeeze('/')
+        return "/#{@config[:prefix]}#{self[:date].strftime("/#{@config[:dateformat]}/#{slug}/")}".squeeze('/')
       else
-        return "/#{@config[:prefix]}#{self[:date].strftime("/%Y/%m/#{slug}/")}".squeeze('/').chomp('/') + @config[:suffix]
+        return "/#{@config[:prefix]}#{self[:date].strftime("/#{@config[:dateformat]}/#{slug}/")}".squeeze('/').chomp('/') + @config[:suffix]
       end
     end
 
