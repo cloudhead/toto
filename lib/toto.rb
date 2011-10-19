@@ -107,7 +107,14 @@ module Toto
         if route.first =~ /\d{4}/
           case route.size
             when 1..3
-              context[archives(route * '-'), :archives]
+              last_item = Integer(route.last) rescue route.last
+              if(last_item.is_a? Fixnum)
+                puts route.last + route.last.class.to_s + ":archives"
+                context[archives(route * '-'), :archives]
+              else
+                puts route.last + route.last.class.to_s + ":article"
+                context[article(route), :article]
+              end
             when 4
               context[article(route), :article]
             else http 400
@@ -272,9 +279,9 @@ module Toto
 
     def path
       if(@config[:suffix]=='/')
-        return "/#{@config[:prefix]}#{self[:date].strftime("/%Y/%m/%d/#{slug}/")}".squeeze('/')
+        return "/#{@config[:prefix]}#{self[:date].strftime("/%Y/%m/#{slug}/")}".squeeze('/')
       else
-        return "/#{@config[:prefix]}#{self[:date].strftime("/%Y/%m/%d/#{slug}/")}".squeeze('/').chomp('/') + @config[:suffix]
+        return "/#{@config[:prefix]}#{self[:date].strftime("/%Y/%m/#{slug}/")}".squeeze('/').chomp('/') + @config[:suffix]
       end
     end
 
