@@ -359,5 +359,26 @@ module Toto
       @response.finish
     end
   end
+  class Route
+    attr_accessor :name,:regex
+    def initialize name,regex
+      @name   = name
+      @regex  = regex
+    end
+  end
+  class Router
+    def initialize
+      @routes = Array.new
+    end
+    def add_route route
+      @routes.push(route)
+    end
+    def match_route path
+      @routes.each do |route|
+        return route if(path =~ route.regex)
+      end
+      return nil
+    end
+  end
 end
 
