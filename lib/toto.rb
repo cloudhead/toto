@@ -109,10 +109,8 @@ module Toto
             when 1..3
               last_item = Integer(route.last) rescue route.last
               if(last_item.is_a? Fixnum)
-                puts route.last + route.last.class.to_s + ":archives"
                 context[archives(route * '-'), :archives]
               else
-                puts route.last + route.last.class.to_s + ":article"
                 context[article(route), :article]
               end
             when 4
@@ -312,7 +310,8 @@ module Toto
       :error => lambda {|code|                              # The HTML for your error page
         "<font style='font-size:300%'>toto, we're not in Kansas anymore (#{code})</font>"
       },
-      :suffix => '/'
+      :suffix => '/',
+      :dateformat => '%Y/%m/%d'
     }
     def initialize obj
       self.update Defaults
