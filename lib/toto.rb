@@ -24,7 +24,7 @@ module Toto
     :pages => "templates/pages",
     :articles => "articles"
   }
-
+ 
   def self.env
     ENV['RACK_ENV'] || 'production'
   end
