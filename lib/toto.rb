@@ -9,7 +9,7 @@ if RUBY_PLATFORM =~ /win32/
   require 'maruku'
   Markdown = Maruku
 else
-  require 'rdiscount'
+  require 'redcarpet'
 end
 
 require 'builder'
@@ -24,7 +24,7 @@ module Toto
     :pages => "templates/pages",
     :articles => "articles"
   }
- 
+
   def self.env
     ENV['RACK_ENV'] || 'production'
   end
@@ -61,6 +61,7 @@ module Toto
   class Site
     def initialize config
       @config = config
+      @tagcloud = Array.new
     end
 
     def [] *args
@@ -85,12 +86,22 @@ module Toto
         end.reverse.map do |article|
           Article.new article, @config
         end : []
-
-      return :archives => Archives.new(entries, @config)
+      return :archives => Archives.new(entries, @config), 
+             :categories => self.categories(entries)
+    end
+    
+    def categories entries
+      cats = Array.new
+      entries.each { |i|
+        cat = (i.category!=nil) ? i.category : ''
+        cats = cats | cat.split('/')
+      }
+      return cats
     end
 
     def article route
-      Article.new("#{Paths[:articles]}/#{route.join('-')}.#{self[:ext]}", @config).load
+      articles = self.index
+      Article.new("#{Paths[:articles]}/#{route.join('-')}.#{self[:ext]}", @config).load(articles)
     end
 
     def /
@@ -225,22 +236,23 @@ module Toto
   class Article < Hash
     include Template
 
-    def initialize obj, config = {}
+    def initialize obj, config = {} 
       @obj, @config = obj, config
       self.load if obj.is_a? Hash
     end
 
-    def load
+    def load articles=''
       data = if @obj.is_a? String
         meta, self[:body] = File.read(@obj).split(/\n\n/, 2)
 
         # use the date from the filename, or else toto won't find the article
         @obj =~ /\/(\d{4}-\d{2}-\d{2})[^\/]*$/
-        ($1 ? {:date => $1} : {}).merge(YAML.load(meta))
+        meta = YAML.load(meta)
+        ($1 ? {:date => $1} : {}).merge(meta)
       elsif @obj.is_a? Hash
         @obj
       end.inject({}) {|h, (k,v)| h.merge(k.to_sym => v) }
-
+      self[:categories] = articles[:categories]
       self.taint
       self.update data
       self[:date] = Date.parse(self[:date].gsub('/', '-')) rescue Date.today
@@ -287,9 +299,11 @@ module Toto
     def date()    @config[:date].call(self[:date])           end
     def author()  self[:author] || @config[:author]          end
     def to_html() self.load; super(:article, @config)        end
+    def category() self[:category] || nil                    end
+    def tags()    self[:tags] ? self[:tags].split(',').map { |i|  i.strip  } : '' end       
+    
     alias :to_s to_html
   end
-
   class Config < Hash
     Defaults = {
       :author => ENV['USER'],                               # blog author
