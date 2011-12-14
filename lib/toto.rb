@@ -94,6 +94,7 @@ module Toto
       cats = Array.new
       entries.each { |i|
         cat = (i.category!=nil) ? i.category : ''
+        puts cat
         cats = cats | cat.split('/')
       }
       return cats
@@ -103,7 +104,13 @@ module Toto
       articles = self.index
       Article.new("#{Paths[:articles]}/#{route.join('-')}.#{self[:ext]}", @config).load(articles)
     end
-
+    
+    def category route
+      index
+    end
+    def tag
+      index
+    end
     def /
       self[:root]
     end
@@ -128,8 +135,11 @@ module Toto
               context[article(route), :article]
             else http 400
           end
-        elsif respond_to?(path)
+        elsif respond_to?(path) 
           context[send(path, type), path.to_sym]
+        elsif respond_to?(path.split('/').first)
+          m = path.split('/').first 
+          context[archives(route * '-'), m]
         elsif (repo = @config[:github][:repos].grep(/#{path}/).first) &&
               !@config[:github][:user].empty?
           context[Repo.new(repo, @config), :repo]
@@ -157,7 +167,7 @@ module Toto
     end
 
     def self.articles ext
-      Dir["#{Paths[:articles]}/*.#{ext}"].sort_by {|entry| File.basename(entry) }
+      Dir["#{Paths[:articles]}/*.#{ext}"].sort_by {|entry| test(?M ,entry) }
     end
 
     class Context
@@ -380,3 +390,4 @@ module Toto
     end
   end
 end
+
