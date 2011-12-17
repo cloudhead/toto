@@ -75,8 +75,9 @@ module Toto
     def index type = :html
       articles = type == :html ? self.articles.reverse : self.articles
       {:articles => articles.map do |article|
-        Article.new article, @config
-      end}.merge archives
+          Article.new article, @config
+        end.sort_by{|article| article.date}
+      }.merge archives
     end
 
     def archives filter = ""
@@ -86,23 +87,11 @@ module Toto
         end.reverse.map do |article|
           Article.new article, @config
         end : []
-      return :archives => Archives.new(entries, @config), 
-             :categories => self.categories(entries)
+      return :archives => Archives.new(entries, @config)
     end
     
-    def categories entries
-      cats = Array.new
-      entries.each { |i|
-        cat = (i.category!=nil) ? i.category : ''
-        puts cat
-        cats = cats | cat.split('/')
-      }
-      return cats
-    end
-
     def article route
-      articles = self.index
-      Article.new("#{Paths[:articles]}/#{route.join('-')}.#{self[:ext]}", @config).load(articles)
+      Article.new("#{Paths[:articles]}/#{route.join('-')}.#{self[:ext]}", @config).load
     end
     
     def category route
@@ -167,19 +156,20 @@ module Toto
     end
 
     def self.articles ext
-      Dir["#{Paths[:articles]}/*.#{ext}"].sort_by {|entry| test(?M ,entry) }
+      Dir["#{Paths[:articles]}/*.#{ext}"].sort_by {|entry| File.basename(entry) }
     end
 
     class Context
       include Template
-      attr_reader :env
+      attr_reader :env, :categories, :tags_cloud
 
       def initialize ctx = {}, config = {}, path = "/", env = {}
         @config, @context, @path, @env = config, ctx, path, env
         @articles = Site.articles(@config[:ext]).reverse.map do |a|
           Article.new(a, @config)
         end
-
+        @categories = Categories.new(@articles,@config)
+        @tags_cloud = TagCloud.new(@articles,@config)
         ctx.each do |k, v|
           meta_def(k) { ctx.instance_of?(Hash) ? v : ctx.send(k) }
         end
@@ -228,7 +218,7 @@ module Toto
     include Template
 
     def initialize articles, config
-      self.replace articles
+      self.replace articles.sort_by{|article| article.date}
       @config = config
     end
 
@@ -251,7 +241,7 @@ module Toto
       self.load if obj.is_a? Hash
     end
 
-    def load articles=''
+    def load 
       data = if @obj.is_a? String
         meta, self[:body] = File.read(@obj).split(/\n\n/, 2)
 
@@ -262,7 +252,6 @@ module Toto
       elsif @obj.is_a? Hash
         @obj
       end.inject({}) {|h, (k,v)| h.merge(k.to_sym => v) }
-      self[:categories] = articles[:categories]
       self.taint
       self.update data
       self[:date] = Date.parse(self[:date].gsub('/', '-')) rescue Date.today
@@ -372,7 +361,6 @@ module Toto
       response = @site.go(route, env, *(mime ? mime : []))
 
       @response.body = [response[:body]]
-      @response.body << mime
       @response['Content-Length'] = response[:body].length.to_s unless response[:body].empty?
       @response['Content-Type']   = Rack::Mime.mime_type(".#{response[:type]}")
 
@@ -387,6 +375,37 @@ module Toto
 
       @response.status = response[:status]
       @response.finish
+    end
+  end
+  
+  # tagcloud class, @todo add more features
+  class TagCloud < Array
+    def initialize articles,config
+      @articles = articles
+      @config   = config
+    end
+    
+    def snowball
+      @articles.map {|article| article.tags.to_s.split('/')}.flatten.uniq.sort
+    end
+    
+    def path obj
+      '/tag/' + obj.to_s
+    end
+  end
+  ## category class, need to add more features
+  class Categories < Array
+    def initialize articles,config
+      @articles = articles
+      @config   = config
+    end
+    
+    def cloud
+      @articles.map { |article| article.category.split('/')}.flatten.uniq.sort
+    end
+    
+    def path obj
+      '/category/' + obj.to_s
     end
   end
 end
