@@ -90,7 +90,10 @@ module Toto
     end
 
     def article route
-      Article.new("#{Paths[:articles]}/#{route.join('-')}.#{self[:ext]}", @config).load
+      path = self.articles.select do |article|
+        File.basename(article, ".#{self[:ext]}").slugize.eql? route.join('-')
+      end.last || File.join(Paths[:articles], "#{route.join('-')}.#{self[:ext]}")
+      Article.new(path, @config).load
     end
 
     def /
