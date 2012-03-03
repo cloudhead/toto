@@ -165,8 +165,7 @@ module Toto
       end
 
       def render page, type
-        content = to_html page, @config
-        type == :html ? to_html(:layout, @config, &Proc.new { content }) : send(:"to_#{type}", page)
+        type == :html ? to_html(:layout, @config, &Proc.new { to_html(page, @config) }) : send(:"to_#{type}", page)
       end
 
       def to_xml page
