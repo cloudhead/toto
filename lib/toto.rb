@@ -99,7 +99,7 @@ module Toto
 
     def go route, env = {}, type = :html
       route << self./ if route.empty?
-      type, path = type =~ /html|xml|json/ ? type.to_sym : :html, route.join('/')
+      type, path = type =~ /html|xml|json|txt/ ? type.to_sym : :html, route.join('/')
       context = lambda do |data, page|
         Context.new(data, @config, path, env).render(page, type)
       end
@@ -166,6 +166,10 @@ module Toto
 
       def render page, type
         type == :html ? to_html(:layout, @config, &Proc.new { to_html(page, @config) }) : send(:"to_#{type}", page)
+      end
+
+      def to_txt page
+        File.read("#{Paths[:templates]}/#{page}.txt")
       end
 
       def to_xml page
