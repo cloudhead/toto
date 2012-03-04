@@ -164,6 +164,10 @@ module Toto
         @config[:title]
       end
 
+      def description
+        @config[:description]
+      end
+
       def render page, type
         type == :html ? to_html(:layout, @config, &Proc.new { to_html(page, @config) }) : send(:"to_#{type}", page)
       end
@@ -292,6 +296,7 @@ module Toto
       :root => "index",                                     # site index
       :url => "http://127.0.0.1",                           # root URL of the site
       :prefix => "",                                        # common path prefix for the blog
+      :description => '',                                   # meta description tag
       :date => lambda {|now| now.strftime("%d/%m/%Y") },    # date function
       :markdown => :smart,                                  # use markdown
       :disqus => false,                                     # disqus name
