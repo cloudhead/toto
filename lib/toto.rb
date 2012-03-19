@@ -338,7 +338,7 @@ module Toto
       response = @site.go(route, env, *(mime ? mime : []))
 
       @response.body = [response[:body]]
-      @response['Content-Length'] = response[:body].length.to_s unless response[:body].empty?
+      @response['Content-Length'] = response[:body].bytesize.to_s unless response[:body].empty?
       @response['Content-Type']   = Rack::Mime.mime_type(".#{response[:type]}")
 
       # Set http cache headers
