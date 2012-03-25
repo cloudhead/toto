@@ -123,9 +123,10 @@ Toto was designed to work well with [heroku](http://heroku.com), it makes the mo
 by setting the _Cache-Control_ and _Etag_ HTTP headers. Deploying on Heroku is really easy, just get the heroku gem,
 create a heroku app with `heroku create`, and push with `git push heroku master`.
 
-    $ heroku create weblog
+    $ heroku create weblog --stack bamboo-ree-1.8.7 
     $ git push heroku master
     $ heroku open
+
 
 ### configuration
 
