@@ -157,6 +157,6 @@ thanks
 
 To heroku for making this easy as pie.
 To adam wiggins, as I stole a couple of ideas from Scanty.
-To the developpers of Rack, for making such an awesome platform.
+To the developers of Rack, for making such an awesome platform.
 
 Copyright (c) 2009-2010 cloudhead. See LICENSE for details.
