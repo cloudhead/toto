@@ -8,7 +8,7 @@ end
 
 class String
   def slugize
-    self.downcase.gsub(/&/, 'and').gsub(/\s+/, '-').gsub(/[^a-z0-9-]/, '')
+    self.downcase.gsub(/&/, 'and').gsub(/[^a-z0-9-]+/, '-').gsub(/^-|-$/, '')
   end
 
   def humanize

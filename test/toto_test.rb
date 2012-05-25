@@ -200,6 +200,16 @@ context Toto do
 
         should("create a valid summary") { topic.summary.size }.within 75..80
       end
+
+      context "all non-alphanumeric characters" do
+        setup do
+            Toto::Article.new({
+            :title  => "Having fun with //Applescript/Bananascript// and Terminal.app///"
+            }, @config)
+        end
+
+        should("be replaced with single dash") { topic.slug }.equals "having-fun-with-applescript-bananascript-and-terminal-app"
+      end
     end
 
     context "in a subdirectory" do
