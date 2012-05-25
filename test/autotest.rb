@@ -10,15 +10,15 @@ end
 
 def run_all_tests
   # see Rakefile for the definition of the test:all task
-  system("rake -s test:all VERBOSE=true")
+  system("rake test VERBOSE=true")
 end
 
 #
 # Watchr Rules
 #
-watch('^test/.*?_test\.rb'   ) {|m| run("ruby -rubygems %s"              % m[0]) }
-watch('^lib/(.*)\.rb'        ) {|m| run("ruby -rubygems test/%s_test.rb" % m[1]) }
-watch('^lib/toto/(.*)\.rb'   ) {|m| run("ruby -rubygems test/%s_test.rb" % m[1]) }
+watch('^test/.*?_test\.rb'   ) { run_all_tests }
+watch('^lib/(.*)\.rb'        ) { run_all_tests }
+watch('^lib/toto/(.*)\.rb'   ) { run_all_tests }
 watch('^test/test_helper\.rb') { run_all_tests }
 
 #

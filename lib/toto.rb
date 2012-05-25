@@ -254,12 +254,13 @@ module Toto
 
     def summary length = nil
       config = @config[:summary]
+      content = markdown(self[:body])
       sum = if self[:body] =~ config[:delim]
-        self[:body].split(config[:delim]).first
+        content.split(config[:delim]).first
       else
-        self[:body].match(/(.{1,#{length || config[:length] || config[:max]}}.*?)(\n|\Z)/m).to_s
+        content.match(/(.{1,#{length || config[:length] || config[:max]}}.*?)(\n|\Z)/m).to_s
       end
-      markdown(sum.length == self[:body].length ? sum : sum.strip.sub(/\.\Z/, '&hellip;'))
+      markdown(sum.length >= content.length ? sum : sum.strip.sub(/\.\Z/, '&hellip;'))
     end
 
     def url
