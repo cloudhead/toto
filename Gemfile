@@ -1,10 +1,16 @@
 source 'https://rubygems.org'
 
-gem 'rspec'
-gem 'capybara'
+group :test do
+  gem 'rspec'
+  gem 'capybara'
+end
+
 gem 'rdiscount'
 gem 'builder'
-gem 'fuubar'
-gem 'rake'
-gem 'jeweler'
-gem 'gemcutter'
+
+group :development do
+  gem 'fuubar'
+  gem 'rake'
+  gem 'jeweler'
+  gem 'gemcutter'
+end
