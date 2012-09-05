@@ -4,14 +4,14 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = %q{toto}
-  s.version = "0.4.9"
+  s.name = %q{Tinman}
+  s.version = "0.1.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.authors = ["cloudhead"]
-  s.date = %q{2010-12-01}
-  s.description = %q{the tiniest blog-engine in Oz.}
-  s.email = %q{self@cloudhead.net}
+  s.authors = ["rschmukler"]
+  s.date = %q{2012-09-05}
+  s.description = %q{Toto, expanded}
+  s.email = %q{ryan@slingingcode.com}
   s.extra_rdoc_files = [
     "LICENSE",
      "README.md"
@@ -25,7 +25,7 @@ Gem::Specification.new do |s|
      "TODO",
      "VERSION",
      "lib/ext/ext.rb",
-     "lib/toto.rb",
+     "lib/tinman.rb",
      "test/articles/1900-05-17-the-wonderful-wizard-of-oz.txt",
      "test/articles/2001-01-01-two-thousand-and-one.txt",
      "test/articles/2009-04-01-tilt-factor.txt",
@@ -41,10 +41,10 @@ Gem::Specification.new do |s|
      "test/templates/layout.rhtml",
      "test/templates/repo.rhtml",
      "test/test_helper.rb",
-     "test/toto_test.rb",
-     "toto.gemspec"
+     "test/tinman_test.rb",
+     "tinman.gemspec"
   ]
-  s.homepage = %q{http://github.com/cloudhead/toto}
+  s.homepage = %q{http://github.com/rschmukler/tinman}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.5}
@@ -52,7 +52,7 @@ Gem::Specification.new do |s|
   s.test_files = [
     "test/autotest.rb",
      "test/test_helper.rb",
-     "test/toto_test.rb"
+     "test/tinman_test.rb"
   ]
 
   if s.respond_to? :specification_version then

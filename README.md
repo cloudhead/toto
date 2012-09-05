@@ -1,13 +1,17 @@
-toto
+TinMan
 ====
 
-the tiniest blogging engine in Oz!
+Because everyone deserves a heart
 
 introduction
 ------------
 
-toto is a git-powered, minimalist blog engine for the hackers of Oz. The engine weighs around ~300 sloc at its worse.
-There is no toto client, at least for now; everything goes through git.
+TinMan is built to extend the functionality of [Toto](https://github.com/cloudhead/toto) to offer a more
+complete feature set, while staying true to the original:
+
+-git powered
+-minimalistic
+-easily customized
 
 blog in 10 seconds
 ------------------

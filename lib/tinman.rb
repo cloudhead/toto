@@ -18,7 +18,7 @@ $:.unshift File.dirname(__FILE__)
 
 require 'ext/ext'
 
-module Toto
+module TinMan
   Paths = {
     :templates => "templates",
     :pages => "templates/pages",
@@ -230,7 +230,7 @@ module Toto
       data = if @obj.is_a? String
         meta, self[:body] = File.read(@obj).split(/\n\n/, 2)
 
-        # use the date from the filename, or else toto won't find the article
+        # use the date from the filename, or else tinman won't find the article
         @obj =~ /\/(\d{4}-\d{2}-\d{2})[^\/]*$/
         ($1 ? {:date => $1} : {}).merge(YAML.load(meta))
       elsif @obj.is_a? Hash
@@ -300,7 +300,7 @@ module Toto
         ERB.new(File.read("#{path}/#{page}.rhtml")).result(ctx)
       },
       :error => lambda {|code|                              # The HTML for your error page
-        "<font style='font-size:300%'>toto, we're not in Kansas anymore (#{code})</font>"
+        "<font style='font-size:300%'>Lions, Tigers and Bears. Oh My! Something went wrong.(#{code})</font>"
       }
     }
     def initialize obj
@@ -323,7 +323,7 @@ module Toto
     def initialize config = {}, &blk
       @config = config.is_a?(Config) ? config : Config.new(config)
       @config.instance_eval(&blk) if block_given?
-      @site = Toto::Site.new(@config)
+      @site = TinMan::Site.new(@config)
     end
 
     def call env
@@ -342,7 +342,7 @@ module Toto
       @response['Content-Type']   = Rack::Mime.mime_type(".#{response[:type]}")
 
       # Set http cache headers
-      @response['Cache-Control'] = if Toto.env == 'production'
+      @response['Cache-Control'] = if TinMan.env == 'production'
         "public, max-age=#{@config[:cache]}"
       else
         "no-cache, must-revalidate"

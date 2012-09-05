@@ -18,7 +18,7 @@ end
 #
 watch('^test/.*?_test\.rb'   ) {|m| run("ruby -rubygems %s"              % m[0]) }
 watch('^lib/(.*)\.rb'        ) {|m| run("ruby -rubygems test/%s_test.rb" % m[1]) }
-watch('^lib/toto/(.*)\.rb'   ) {|m| run("ruby -rubygems test/%s_test.rb" % m[1]) }
+watch('^lib/tinman/(.*)\.rb'   ) {|m| run("ruby -rubygems test/%s_test.rb" % m[1]) }
 watch('^test/test_helper\.rb') { run_all_tests }
 
 #

@@ -4,12 +4,12 @@ require 'rake'
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
-    gem.name = "toto"
-    gem.summary = %Q{the tiniest blog-engine in Oz}
-    gem.description = %Q{the tiniest blog-engine in Oz.}
-    gem.email = "self@cloudhead.net"
-    gem.homepage = "http://github.com/cloudhead/toto"
-    gem.authors = ["cloudhead"]
+    gem.name = "TinMan"
+    gem.summary = %Q{Toto, expanded}
+    gem.description = %Q{Toto, expanded}
+    gem.email = "ryan@slingingcode.com"
+    gem.homepage = "http://github.com/rschmukler/tinman"
+    gem.authors = ["rschmukler"]
     gem.add_development_dependency "riot"
     gem.add_dependency "builder"
     gem.add_dependency "rack"
