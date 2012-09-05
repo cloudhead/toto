@@ -9,9 +9,9 @@ introduction
 TinMan is built to extend the functionality of [Toto](https://github.com/cloudhead/toto) to offer a more
 complete feature set, while staying true to the original:
 
--git powered
--minimalistic
--easily customized
+- git powered
+- minimalistic
+- easily customized
 
 blog in 10 seconds
 ------------------
