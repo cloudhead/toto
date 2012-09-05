@@ -4,13 +4,13 @@ require 'rake'
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
-    gem.name = "TinMan"
+    gem.name = "Glinda"
     gem.summary = %Q{Toto, expanded}
     gem.description = %Q{Toto, expanded}
     gem.email = "ryan@slingingcode.com"
-    gem.homepage = "http://github.com/rschmukler/tinman"
+    gem.homepage = "http://github.com/rschmukler/glinda"
     gem.authors = ["rschmukler"]
-    gem.add_development_dependency "riot"
+    gem.add_development_dependency "rspec"
     gem.add_dependency "builder"
     gem.add_dependency "rack"
     if RUBY_PLATFORM =~ /win32/

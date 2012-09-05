@@ -6,7 +6,7 @@ require 'capybara/rspec'
 $:.unshift File.dirname(__FILE__)
 $:.unshift File.join(File.dirname(__FILE__), '..', 'lib')
 
-require 'tinman'
+require 'glinda'
 
-Capybara.app = TinMan::Server.new
+Capybara.app = Glinda::Server.new
 

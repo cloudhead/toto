@@ -18,7 +18,7 @@ $:.unshift File.dirname(__FILE__)
 
 require 'ext/ext'
 
-module TinMan
+module Glinda
   Paths = {
     :templates => "templates",
     :pages => "templates/pages",
@@ -323,7 +323,7 @@ module TinMan
     def initialize config = {}, &blk
       @config = config.is_a?(Config) ? config : Config.new(config)
       @config.instance_eval(&blk) if block_given?
-      @site = TinMan::Site.new(@config)
+      @site = Glinda::Site.new(@config)
     end
 
     def call env
@@ -342,7 +342,7 @@ module TinMan
       @response['Content-Type']   = Rack::Mime.mime_type(".#{response[:type]}")
 
       # Set http cache headers
-      @response['Cache-Control'] = if TinMan.env == 'production'
+      @response['Cache-Control'] = if Glinda.env == 'production'
         "public, max-age=#{@config[:cache]}"
       else
         "no-cache, must-revalidate"

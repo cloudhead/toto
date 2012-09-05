@@ -2,22 +2,22 @@ require 'spec_helper'
 require 'date'
 
 URL = "http://toto.oz"
-AUTHOR = "TinMan"
+AUTHOR = "Glinda"
 
 include Capybara::DSL
 include Capybara::RSpecMatchers
 
-describe TinMan do
+describe Glinda do
   before(:each) do
-    @config = TinMan::Config.new(:markdown => true, :author => AUTHOR, :url => URL)
-    @tinman = Rack::MockRequest.new(TinMan::Server.new(@config))
-    TinMan::Paths[:articles] = "spec/articles"
-    TinMan::Paths[:pages] = "spec/templates"
-    TinMan::Paths[:templates] = "spec/templates"
+    @config = Glinda::Config.new(:markdown => true, :author => AUTHOR, :url => URL)
+    @glinda = Rack::MockRequest.new(Glinda::Server.new(@config))
+    Glinda::Paths[:articles] = "spec/articles"
+    Glinda::Paths[:pages] = "spec/templates"
+    Glinda::Paths[:templates] = "spec/templates"
   end
 
   describe "GET /" do
-    let(:response) { @tinman.get('/') }
+    let(:response) { @glinda.get('/') }
 
     it "should return status code 200" do
       response.status.should == 200
@@ -42,7 +42,7 @@ describe TinMan do
     end
 
     context "with no articles" do
-      let(:response) { Rack::MockRequest.new(TinMan::Server.new(@config.merge(:ext => 'oxo'))).get('/') }
+      let(:response) { Rack::MockRequest.new(Glinda::Server.new(@config.merge(:ext => 'oxo'))).get('/') }
 
       it "should return status code 200" do
         response.status.should == 200
@@ -58,7 +58,7 @@ describe TinMan do
         @config[:to_html] = lambda do |path, page, binding|
           ERB.new(File.read("#{path}/#{page}.rhtml")).result(binding)
         end
-        @tinman.get('/')
+        @glinda.get('/')
       end
 
       it "should return status code 200" do
@@ -94,7 +94,7 @@ describe TinMan do
   end
 
   context "GET /about" do
-    let(:response) { @tinman.get('/about') }
+    let(:response) { @glinda.get('/about') }
     it "should return status code 200" do
       response.status.should == 200
     end
@@ -114,7 +114,7 @@ describe TinMan do
   end
 
   context "GET a single article" do
-    let(:response) { @tinman.get("/1900/05/17/the-wonderful-wizard-of-oz") }
+    let(:response) { @glinda.get("/1900/05/17/the-wonderful-wizard-of-oz") }
 
     it "should return status code 200" do
       response.status.should == 200
@@ -164,7 +164,7 @@ describe TinMan do
   context "GET to an unknown route with a custom error" do
     before(:each) do
       @config[:error] = lambda {|code| "error: #{code}" }
-      Capybara.app = TinMan::Server.new(@config)
+      Capybara.app = Glinda::Server.new(@config)
       visit('/unknown')
     end
 
@@ -178,7 +178,7 @@ describe TinMan do
   end
 
   context "Request is invalid" do
-    let(:response) { @tinman.delete('/invalid') }
+    let(:response) { @glinda.delete('/invalid') }
     it "should return status code 400" do
       response.status.should == 400
     end
@@ -232,7 +232,7 @@ describe TinMan do
 
   context "GET to a repo name" do
     before(:all) do
-      class TinMan::Repo
+      class Glinda::Repo
         def readme() "#{self[:name]}'s README" end
       end
     end
@@ -240,7 +240,7 @@ describe TinMan do
     context "when the repo is in the :repos array" do
       before(:each) do
         @config[:github] = {:user => "cloudhead", :repos => ['the-repo']}
-        Capybara.app = TinMan::Server.new(@config)
+        Capybara.app = Glinda::Server.new(@config)
         visit '/the-repo'
       end
       it "should return the repo README" do
@@ -251,7 +251,7 @@ describe TinMan do
     context "when the repo is not in the :repos array" do
       before :each do
         @config[:github] = {:user => "cloudhead", :repos => []}
-        Capybara.app = TinMan::Server.new(@config)
+        Capybara.app = Glinda::Server.new(@config)
         visit '/the-repo'
       end
 
@@ -266,20 +266,20 @@ describe TinMan do
       @config[:markdown] = true
       @config[:date] = lambda {|t| "the time is #{t.strftime("%Y/%m/%d %H:%M")}" }
       @config[:summary] = {:length => 50}
-      Capybara.app = TinMan::Server.new(@config)
+      Capybara.app = Glinda::Server.new(@config)
     end
 
     context "with the bare essentials" do
 
-      let(:article) { TinMan::Article.new({ title: "TinMan & The Wizard of Oz.", body: "#Chapter I\nHello, *stranger*." }, @config) }
+      let(:article) { Glinda::Article.new({ title: "Glinda & The Wizard of Oz.", body: "#Chapter I\nHello, *stranger*." }, @config) }
 
-      it { article.title.should == "TinMan & The Wizard of Oz." }
+      it { article.title.should == "Glinda & The Wizard of Oz." }
       it "should parse the body as markdown" do
         article.body.should == "<h1>Chapter I</h1>\n\n<p>Hello, <em>stranger</em>.</p>\n"
       end
 
       it "should create the appropriate slug" do
-        article.slug.should == "tinman-and-the-wizard-of-oz"
+        article.slug.should == "glinda-and-the-wizard-of-oz"
       end
 
       it "should set the date" do
@@ -295,18 +295,18 @@ describe TinMan do
       end
 
       it "should have a path" do
-        article.path.should == Date.today.strftime("/%Y/%m/%d/tinman-and-the-wizard-of-oz/")
+        article.path.should == Date.today.strftime("/%Y/%m/%d/glinda-and-the-wizard-of-oz/")
       end
 
       it "should have a URL" do
-        article.url.should == Date.today.strftime("#{URL}/%Y/%m/%d/tinman-and-the-wizard-of-oz/")
+        article.url.should == Date.today.strftime("#{URL}/%Y/%m/%d/glinda-and-the-wizard-of-oz/")
       end
     end
 
     context "with a user-defined summary" do
       let(:article) do
-        TinMan::Article.new({
-          :title => "TinMan & The Wizard of Oz.",
+        Glinda::Article.new({
+          :title => "Glinda & The Wizard of Oz.",
           :body => "Well,\nhello ~\n, *stranger*."
         }, @config.merge(:markdown => false, :summary => {:max => 150, :delim => /~\n/}))
       end
@@ -322,7 +322,7 @@ describe TinMan do
 
     context "with everything specified" do
       let(:article) do
-        TinMan::Article.new({
+        Glinda::Article.new({
           :title  => "The Wizard of Oz",
           :body   => ("a little bit of text." * 5) + "\n" + "filler" * 10,
           :date   => "19/10/1976",
@@ -354,7 +354,7 @@ describe TinMan do
       context "and a short first paragraph" do
         let(:article) do
           @config[:markdown] = false
-          TinMan::Article.new({:body => "there ain't such thing as a free lunch\n" * 10}, @config)
+          Glinda::Article.new({:body => "there ain't such thing as a free lunch\n" * 10}, @config)
         end
 
         it "should create a valid summary" do
@@ -367,47 +367,47 @@ describe TinMan do
     context "in a subdirectory" do
       context "with implicit leading forward slash" do
         let(:article) do
-          conf = TinMan::Config.new({})
+          conf = Glinda::Config.new({})
           conf.set(:prefix, "blog")
-          TinMan::Article.new({
-            :title => "TinMan & The Wizard of Oz.",
+          Glinda::Article.new({
+            :title => "Glinda & The Wizard of Oz.",
             :body => "#Chapter I\nhello, *stranger*."
           }, conf)
         end
 
         it "should be in the directory" do
-          article.path.should == Date.today.strftime("/blog/%Y/%m/%d/tinman-and-the-wizard-of-oz/")
+          article.path.should == Date.today.strftime("/blog/%Y/%m/%d/glinda-and-the-wizard-of-oz/")
         end
 
       end
 
       context "with explicit leading forward slash" do
         let(:article) do
-          conf = TinMan::Config.new({})
+          conf = Glinda::Config.new({})
           conf.set(:prefix, "/blog")
-          TinMan::Article.new({
-            :title => "TinMan & The Wizard of Oz.",
+          Glinda::Article.new({
+            :title => "Glinda & The Wizard of Oz.",
             :body => "#Chapter I\nhello, *stranger*."
           }, conf)
         end
 
         it "should be in the directory do" do
-          article.path.should == Date.today.strftime("/blog/%Y/%m/%d/tinman-and-the-wizard-of-oz/")
+          article.path.should == Date.today.strftime("/blog/%Y/%m/%d/glinda-and-the-wizard-of-oz/")
         end
       end
 
       context "with explicit trailing forward slash" do
         let(:article) do
-          conf = TinMan::Config.new({})
+          conf = Glinda::Config.new({})
           conf.set(:prefix, "blog/")
-          TinMan::Article.new({
-            :title => "TinMan & The Wizard of Oz.",
+          Glinda::Article.new({
+            :title => "Glinda & The Wizard of Oz.",
             :body => "#Chapter I\nhello, *stranger*."
           }, conf)
         end
 
         it "should be in the directory do" do
-          article.path.should == Date.today.strftime("/blog/%Y/%m/%d/tinman-and-the-wizard-of-oz/")
+          article.path.should == Date.today.strftime("/blog/%Y/%m/%d/glinda-and-the-wizard-of-oz/")
         end
       end
     end
@@ -415,7 +415,7 @@ describe TinMan do
 
   context "using Config#set with a hash" do
     let(:conf) do
-      conf = TinMan::Config.new({})
+      conf = Glinda::Config.new({})
       conf.set(:summary, {:delim => /%/})
       conf
     end
@@ -431,7 +431,7 @@ describe TinMan do
 
   context "using Config#set with a block" do
     let(:conf) do
-      conf = TinMan::Config.new({})
+      conf = Glinda::Config.new({})
       conf.set(:to_html) {|path, p, _| path + p }
       conf
     end
@@ -444,7 +444,7 @@ describe TinMan do
   context "testing individual configuration parameters" do
     context "generate error pages" do
       let(:conf) do
-        conf = TinMan::Config.new({})
+        conf = Glinda::Config.new({})
         conf.set(:error) {|code| "error code #{code}" }
         conf
       end
