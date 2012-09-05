@@ -1,4 +1,4 @@
-TinMan
+Glinda
 ====
 
 Because everyone deserves a heart
@@ -6,7 +6,7 @@ Because everyone deserves a heart
 introduction
 ------------
 
-TinMan is built to extend the functionality of [Toto](https://github.com/cloudhead/toto) to offer a more
+Glinda is built to extend the functionality of [Toto](https://github.com/cloudhead/toto) to offer a more
 complete feature set, while staying true to the original:
 
 - git powered
