@@ -1,7 +1,7 @@
 Glinda
 ====
 
-Because everyone deserves a heart
+Everyones favorite good witch
 
 introduction
 ------------
