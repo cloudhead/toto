@@ -18,6 +18,7 @@ GEM
       rspec (~> 2.0)
       rspec-instafail (~> 0.2.0)
       ruby-progressbar (~> 0.0.10)
+    gemcutter (0.7.1)
     git (1.2.5)
     jeweler (1.8.4)
       bundler (~> 1.0)
@@ -63,6 +64,7 @@ DEPENDENCIES
   builder
   capybara
   fuubar
+  gemcutter
   jeweler
   rake
   rdiscount
