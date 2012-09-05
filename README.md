@@ -16,13 +16,15 @@ complete feature set, while staying true to the original:
 blog in 10 seconds
 ------------------
 
-    $ git clone git://github.com/cloudhead/dorothy.git myblog
+    $ git clone git://github.com/rschmukler/dorothy-with-glinda.git myblog
     $ cd myblog
     $ heroku create myblog
     $ git push heroku master
 
 philosophy
 ----------
+
+Glinda follows the same philosophy as Toto
 
 Everything that can be done better with another tool should be, but one should not have too much pie to stay fit.
 In other words, toto does away with web frameworks or DSLs such as sinatra, and is built right on top of **rack**.
@@ -50,20 +52,20 @@ how it works
 - summaries are generated intelligently by toto, following the `:max` setting you give it.
 - you can also define how long your summary is, by adding `~` at the end of it (`:delim`).
 
-dorothy
--------
+dorothy-with-glinda
+-------------------
 
-Dorothy is toto's default template, you can get it at <http://github.com/cloudhead/dorothy>. It
+Dorothy-with-glinda is glinda's default template, you can get it at <http://github.com/rschmukler/dorothy-with-glinda>. It
 comes with a very minimalistic but functional template, and a _config.ru_ file to get you started.
-It also includes a _.gems_ file, for heroku.
+It also includes a Gemfile file, for heroku and bundler.
 
 synopsis
 --------
 
-One would start by installing _toto_, with `sudo gem install toto`, and then forking or
-cloning the `dorothy` repo, to get a basic skeleton:
+One would start by installing _glinda_, with `sudo gem install glinda`, and then forking or
+cloning the `dorothy-with-glinda` repo, to get a basic skeleton:
 
-    $ git clone git://github.com/cloudhead/dorothy.git weblog
+    $ git clone git://github.com/rschmukler/dorothy-with-glinda.git weblog
     $ cd weblog/
 
 One would then edit the template at will, it has the following structure:
@@ -123,7 +125,7 @@ With unicorn, you can just do:
 
 #### on heroku
 
-Toto was designed to work well with [heroku](http://heroku.com), it makes the most out of it's state-of-the-art caching,
+Toto, and subsequently Glinda, was designed to work well with [heroku](http://heroku.com), it makes the most out of it's state-of-the-art caching,
 by setting the _Cache-Control_ and _Etag_ HTTP headers. Deploying on Heroku is really easy, just get the heroku gem,
 create a heroku app with `heroku create`, and push with `git push heroku master`.
 
@@ -159,8 +161,6 @@ you could add `set :author, 'John Galt'` inside the `Toto::Server.new` block. He
 thanks
 ------
 
-To heroku for making this easy as pie.
-To adam wiggins, as I stole a couple of ideas from Scanty.
-To the developpers of Rack, for making such an awesome platform.
+To cloudhead for the awesome Toto platform
 
-Copyright (c) 2009-2010 cloudhead. See LICENSE for details.
+Copyright (c) 2012
