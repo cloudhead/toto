@@ -76,23 +76,9 @@ module Glinda
       articles = type == :html ? self.articles.reverse : self.articles
       {:articles => articles.map do |article|
         Article.new article, @config
-      end}.merge(archives).merge(tag_list)
+      end}.merge(archives)
     end
 
-    def tag_list
-      tag_list = []
-      if !self.articles.empty?
-        entries = self.articles.map do |article|
-          Article.new(article, @config).load
-        end
-
-        entries.select{ |x| x.has_key?(:tags) }.map(&:tags).each do |tags|
-          tag_list += tags.split(',')
-        end
-      end
-      return :tag_list => tag_list.uniq, tag: nil
-
-    end
 
     def archives filter = "", tag = nil
       entries = ! self.articles.empty??
@@ -147,7 +133,7 @@ module Glinda
           if route.length == 2
             context[archives("", route[1]), :tags]
           else
-            context[tag_list(), :tags]
+            context[{tag: nil}, :tags]
           end
         elsif respond_to?(path)
           context[send(path, type), path.to_sym]
@@ -181,6 +167,20 @@ module Glinda
       Dir["#{Paths[:articles]}/*.#{ext}"].sort_by {|entry| File.basename(entry) }
     end
 
+    def self.tag_list(ext)
+      tag_list = []
+      if !self.articles(ext).empty?
+        entries = self.articles(ext).map do |article|
+          Article.new(article, @config)
+        end
+
+        entries.map(&:tags).each do |tags|
+          tag_list += tags
+        end
+      end
+      return tag_list
+    end
+
     class Context
       include Template
       attr_reader :env
@@ -194,6 +194,10 @@ module Glinda
         ctx.each do |k, v|
           meta_def(k) { ctx.instance_of?(Hash) ? v : ctx.send(k) }
         end
+      end
+
+      def tag_list
+        @tag_list ||= Site.tag_list(@config[:ext])
       end
 
       def title
@@ -309,6 +313,14 @@ module Glinda
 
     def path
       "/#{@config[:prefix]}#{self[:date].strftime("/%Y/%m/%d/#{slug}/")}".squeeze('/')
+    end
+
+    def tags
+      if self[:tags]
+        self[:tags].split(',').map(&:split)
+      else
+        []
+      end
     end
 
     def title()   self[:title] || "an article"               end

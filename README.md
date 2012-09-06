@@ -21,6 +21,29 @@ blog in 10 seconds
     $ heroku create myblog
     $ git push heroku master
 
+differences from toto
+---------------------
+
+### 1. Tagging Support
+
+Glinda supports tagging on articles. You may specify tags in articles by
+passing in a comma delimited list of tags.
+
+    title: the wizard of oz
+    date: 12/10/1932
+    tags: wizards, bears
+
+    This is a test
+
+After that, you may access a few variables.
+
+You may access a list of tags in all articles by using
+`tag_list` in any view.
+
+If a tag is passed such as: `/tags/wizards` you can access the tag in
+the `tags.rhtml` view by calling the variable `tag`. You may access all
+articles in the 
+
 philosophy
 ----------
 
