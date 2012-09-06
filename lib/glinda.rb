@@ -4,6 +4,7 @@ require 'erb'
 require 'rack'
 require 'digest'
 require 'open-uri'
+require 'pry'
 
 if RUBY_PLATFORM =~ /win32/
   require 'maruku'
@@ -75,10 +76,25 @@ module Glinda
       articles = type == :html ? self.articles.reverse : self.articles
       {:articles => articles.map do |article|
         Article.new article, @config
-      end}.merge archives
+      end}.merge(archives).merge(tag_list)
     end
 
-    def archives filter = ""
+    def tag_list
+      tag_list = []
+      if !self.articles.empty?
+        entries = self.articles.map do |article|
+          Article.new(article, @config).load
+        end
+
+        entries.select{ |x| x.has_key?(:tags) }.map(&:tags).each do |tags|
+          tag_list += tags.split(',')
+        end
+      end
+      return :tag_list => tag_list.uniq, tag: nil
+
+    end
+
+    def archives filter = "", tag = nil
       entries = ! self.articles.empty??
         self.articles.select do |a|
           filter !~ /^\d{4}/ || File.basename(a) =~ /^#{filter}/
@@ -86,7 +102,20 @@ module Glinda
           Article.new article, @config
         end : []
 
-      return :archives => Archives.new(entries, @config)
+      if tag.nil?
+        return :archives => Archives.new(entries, @config)
+      else
+        tagged_entries = entries.select do |e|
+          if e[:tags]
+            tags = e[:tags].split(',').map(&:strip).map(&:slugize)
+            tags.include? tag.slugize
+          else
+            false
+          end
+        end
+
+        return :archives => Archives.new(tagged_entries, @config), :tag => tag
+      end
     end
 
     def article route
@@ -112,6 +141,13 @@ module Glinda
             when 4
               context[article(route), :article]
             else http 400
+          end
+        elsif route.first == 'tags'
+          data = {}
+          if route.length == 2
+            context[archives("", route[1]), :tags]
+          else
+            context[tag_list(), :tags]
           end
         elsif respond_to?(path)
           context[send(path, type), path.to_sym]

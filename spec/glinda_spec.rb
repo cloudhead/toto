@@ -14,6 +14,7 @@ describe Glinda do
     Glinda::Paths[:articles] = "spec/articles"
     Glinda::Paths[:pages] = "spec/templates"
     Glinda::Paths[:templates] = "spec/templates"
+    Glinda.env = 'test'
   end
 
   describe "GET /" do
@@ -39,6 +40,11 @@ describe Glinda do
     it "should include an archive" do
       visit '/'
       page.all('#archives li').count.should == 2
+    end
+
+    it "should have access to the tag_list" do
+      visit '/'
+      page.all('#tag_list li').count.should >= 2
     end
 
     context "with no articles" do
@@ -89,6 +95,42 @@ describe Glinda do
 
       it "should set the ETag value" do
         response.headers["ETag"].should_not be_empty
+      end
+    end
+  end
+
+  context "GET /tags" do
+    context "with a tag passed" do
+      let(:response) { @glinda.get '/tags/wizards' }
+
+      it "should return status code 200" do
+        response.status.should == 200
+      end
+
+      it "should set the content-type" do
+        response.content_type.should == "text/html"
+      end
+
+      it "should set the body to not enty" do
+        response.body.should_not be_empty
+      end
+
+      it "should include articles with the right tag" do
+        visit '/tags/wizards'
+        page.all('#articles li').count.should == 1
+      end
+
+
+      it "should have access to the tag passed in" do
+        visit '/tags/wizards'
+        page.find('#tag').should have_content 'wizards'
+      end
+    end
+
+    context "without a tag passed" do
+      it "should have access to a list of all tags" do
+        visit '/tags'
+        page.find('#tags').all('li').count.should >= 2
       end
     end
   end

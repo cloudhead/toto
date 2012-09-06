@@ -1,0 +1,13 @@
+<% if !tag.nil? %>
+  <span id="tag"><%= tag %></span>
+  <ul id="articles">
+    <% archives.each do |a| %>
+      <li><%= a.title %></li>
+    <% end %>
+  </ul>
+<% else %>
+  <ul id="tags">
+    <% tag_list.each do |t| %>
+      <li><%= t %></li>
+    <% end %>
+<% end %>

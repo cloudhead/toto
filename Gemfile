@@ -14,3 +14,7 @@ group :development do
   gem 'jeweler'
   gem 'gemcutter'
 end
+
+group :test, :development do
+  gem 'pry'
+end
