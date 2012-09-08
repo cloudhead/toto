@@ -317,7 +317,7 @@ module Glinda
 
     def tags
       if self[:tags]
-        self[:tags].split(',').map(&:split)
+        self[:tags].split(',').map(&:strip)
       else
         []
       end
