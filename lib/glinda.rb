@@ -4,7 +4,6 @@ require 'erb'
 require 'rack'
 require 'digest'
 require 'open-uri'
-require 'pry'
 
 if RUBY_PLATFORM =~ /win32/
   require 'maruku'
