@@ -71,14 +71,6 @@ module Glinda
   end
 
   class Site
-    if defined? NewRelic
-      include NewRelic::Agent::MethodTracer
-      add_method_tracer :index
-      add_method_tracer :archives
-      add_method_tracer :article
-      add_method_tracer :/
-      add_method_tracer :go
-    end
 
     def initialize config
       @config = config
@@ -199,6 +191,15 @@ module Glinda
         end
       end
       return tag_list
+    end
+
+    if defined? NewRelic
+      include NewRelic::Agent::MethodTracer
+      add_method_tracer :index
+      add_method_tracer :archives
+      add_method_tracer :article
+      add_method_tracer :/
+      add_method_tracer :go
     end
 
     class Context
