@@ -5,6 +5,18 @@ require 'rack'
 require 'digest'
 require 'open-uri'
 
+begin
+  require 'newrelic_rpm'
+  require 'new_relic/agent/instrumentation/rack'
+  require 'new_relic/agent/instrumentation/controller_instrumentation'
+  ERB.class_eval do
+    include NewRelic::Agent::MethodTracer
+    add_method_tracer :initialize
+    add_method_tracer :result
+  end
+rescue LoadError
+end
+
 if RUBY_PLATFORM =~ /win32/
   require 'maruku'
   Markdown = Maruku
@@ -59,6 +71,15 @@ module Glinda
   end
 
   class Site
+    if defined? NewRelic
+      include NewRelic::Agent::MethodTracer
+      add_method_tracer :index
+      add_method_tracer :archives
+      add_method_tracer :article
+      add_method_tracer :/
+      add_method_tracer :go
+    end
+
     def initialize config
       @config = config
     end
@@ -182,6 +203,10 @@ module Glinda
 
     class Context
       include Template
+      if defined? NewRelic
+        include NewRelic::Agent::MethodTracer
+        add_method_tracer :to_html, 'Custom/#{self.class.name}/to_html/#{args.first}'
+      end
       attr_reader :env
 
       def initialize ctx = {}, config = {}, path = "/", env = {}
@@ -222,6 +247,10 @@ module Glinda
 
   class Repo < Hash
     include Template
+    if defined? NewRelic
+      include NewRelic::Agent::MethodTracer
+      add_method_tracer :to_html, 'Custom/#{self.class.name}/to_html/#{args.first}'
+    end
 
     README = "https://github.com/%s/%s/raw/master/README.%s"
 
@@ -240,6 +269,10 @@ module Glinda
 
   class Archives < Array
     include Template
+    if defined? NewRelic
+      include NewRelic::Agent::MethodTracer
+      add_method_tracer :to_html, 'Custom/#{self.class.name}/to_html/#{args.first}'
+    end
 
     def initialize articles, config
       self.replace articles
@@ -259,6 +292,10 @@ module Glinda
 
   class Article < Hash
     include Template
+    if defined? NewRelic
+      include NewRelic::Agent::MethodTracer
+      add_method_tracer :to_html, 'Custom/#{self.class.name}/to_html/#{args.first}'
+    end
 
     def initialize obj, config = {}
       @obj, @config = obj, config
@@ -366,6 +403,7 @@ module Glinda
 
   class Server
     attr_reader :config, :site
+    include NewRelic::Agent::Instrumentation::ControllerInstrumentation if defined? NewRelic
 
     def initialize config = {}, &blk
       @config = config.is_a?(Config) ? config : Config.new(config)
