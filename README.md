@@ -42,7 +42,9 @@ You may access a list of tags in all articles by using
 
 If a tag is passed such as: `/tags/wizards` you can access the tag in
 the `tags.rhtml` view by calling the variable `tag`. You may access all
-articles tagged with the specified tag by calling `archives`
+articles tagged with the specified tag by calling `archives` when in the
+`/tags/tag_name` page
+
 
 philosophy
 ----------
