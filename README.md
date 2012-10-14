@@ -45,6 +45,13 @@ the `tags.rhtml` view by calling the variable `tag`. You may access all
 articles tagged with the specified tag by calling `archives` when in the
 `/tags/tag_name` page
 
+### 2. NewRelic Support
+
+Glinda support NewRelic analytics. To enable support you must add
+`gem 'newrelic_rpm'` to your Gemfile for your application. Once the
+library is added, the various classes of Glinda have been extended to
+support NewRelic tracking. The implementation is heavily based on the
+suggestions of the [JKFill Blog](http://jkfill.com/2011/03/27/using-new-relic-in-a-rack-app)
 
 philosophy
 ----------
