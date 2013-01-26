@@ -19,7 +19,7 @@ context Toto do
     asserts("returns a 200")                { topic.status }.equals 200
     asserts("body is not empty")            { not topic.body.empty? }
     asserts("content type is set properly") { topic.content_type }.equals "text/html"
-    should("include a couple of article")   { topic.body }.includes_elements("#articles li", 3)
+    should("include a couple of articles")   { topic.body }.includes_elements("#articles li", 3)
     should("include an archive")            { topic.body }.includes_elements("#archives li", 2)
 
     context "with no articles" do
@@ -101,6 +101,7 @@ context Toto do
     asserts("body should be valid xml")     { topic.body }.includes_html("feed > entry" => /.+/)
     asserts("summary shouldn't be empty")   { topic.body }.includes_html("summary" => /.{10,}/)
   end
+
   context "GET /index?param=testparam (get parameter)" do
     setup { @toto.get('/index?param=testparam')   }
     asserts("returns a 200")                { topic.status }.equals 200
@@ -109,8 +110,6 @@ context Toto do
     asserts("access the http get parameter")           { topic.body }.includes_html("p" => /request method type: GET/)
     asserts("access the http parameter name value pair")           { topic.body }.includes_html("p" => /request name value pair: param=testparam/)
   end
-
-
 
   context "GET to a repo name" do
     setup do
@@ -202,6 +201,18 @@ context Toto do
       end
     end
 
+    context "with a date specified in US format" do
+      setup do
+        conf = Toto::Config.new({})
+        conf.set(:date_format, "%m/%d/%Y")
+        Toto::Article.new({
+          :date => "01/31/2012"
+        }, conf)
+      end
+
+      should("parse the date") { [topic[:date].month, topic[:date].day, topic[:date].year] }.equals [1, 31, 2012]
+    end
+
     context "in a subdirectory" do
       context "with implicit leading forward slash" do
         setup do
@@ -244,6 +255,14 @@ context Toto do
     end
   end
 
+  context "with an existing article" do
+    setup do
+      Toto::Article.new("#{File.dirname(__FILE__)}/articles/2009-12-04-some-random-article.txt", Toto::Config::Defaults)
+    end
+
+    should("pick up the date correctly") { [topic[:date].month, topic[:date].day, topic[:date].year] }.equals [10, 12, 1932]
+  end
+
   context "using Config#set with a hash" do
     setup do
       conf = Toto::Config.new({})
@@ -281,5 +300,3 @@ context Toto do
     should("respond to iso8601") { Date.today }.respond_to?(:iso8601)
   end
 end
-
-
