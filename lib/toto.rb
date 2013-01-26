@@ -239,7 +239,7 @@ module Toto
 
       self.taint
       self.update data
-      self[:date] = Date.parse(self[:date].gsub('/', '-')) rescue Date.today
+      self[:date] = Date.strptime(self[:date], self[:date] =~ /-/ ? "%Y-%m-%d" : @config[:date_format]) rescue Date.today
       self
     end
 
@@ -290,6 +290,7 @@ module Toto
       :url => "http://127.0.0.1",                           # root URL of the site
       :prefix => "",                                        # common path prefix for the blog
       :date => lambda {|now| now.strftime("%d/%m/%Y") },    # date function
+      :date_format => "%d/%m/%Y",                           # date format
       :markdown => :smart,                                  # use markdown
       :disqus => false,                                     # disqus name
       :summary => {:max => 150, :delim => /~\n/},           # length of summary and delimiter

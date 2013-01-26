@@ -201,6 +201,18 @@ context Toto do
       end
     end
 
+    context "with a date specified in US format" do
+      setup do
+        conf = Toto::Config.new({})
+        conf.set(:date_format, "%m/%d/%Y")
+        Toto::Article.new({
+          :date => "01/31/2012"
+        }, conf)
+      end
+
+      should("parse the date") { [topic[:date].month, topic[:date].day, topic[:date].year] }.equals [1, 31, 2012]
+    end
+
     context "in a subdirectory" do
       context "with implicit leading forward slash" do
         setup do
@@ -241,6 +253,14 @@ context Toto do
         should("be in the directory") { topic.path }.equals Date.today.strftime("/blog/%Y/%m/%d/toto-and-the-wizard-of-oz/")
       end
     end
+  end
+
+  context "with an existing article" do
+    setup do
+      Toto::Article.new("#{File.dirname(__FILE__)}/articles/2009-12-04-some-random-article.txt", Toto::Config::Defaults)
+    end
+
+    should("pick up the date correctly") { [topic[:date].month, topic[:date].day, topic[:date].year] }.equals [10, 12, 1932]
   end
 
   context "using Config#set with a hash" do
