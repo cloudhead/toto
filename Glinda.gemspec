@@ -4,14 +4,14 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = "glinda"
-  s.version = "0.2.1"
+  s.name = %q{glinda}
+  s.version = "0.2.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.authors = ["rschmukler"]
-  s.date = "2012-10-14"
-  s.description = "Toto, expanded"
-  s.email = "ryan@slingingcode.com"
+  s.authors = [%q{rschmukler}]
+  s.date = %q{2013-03-18}
+  s.description = %q{Toto, expanded}
+  s.email = %q{ryan@slingingcode.com}
   s.extra_rdoc_files = [
     "LICENSE",
     "README.md"
@@ -45,10 +45,10 @@ Gem::Specification.new do |s|
     "spec/templates/repo.rhtml",
     "spec/templates/tags.rhtml"
   ]
-  s.homepage = "http://github.com/rschmukler/glinda"
-  s.require_paths = ["lib"]
-  s.rubygems_version = "1.8.24"
-  s.summary = "Toto, expanded"
+  s.homepage = %q{http://github.com/rschmukler/glinda}
+  s.require_paths = [%q{lib}]
+  s.rubygems_version = %q{1.8.6}
+  s.summary = %q{Toto, expanded}
 
   if s.respond_to? :specification_version then
     s.specification_version = 3
