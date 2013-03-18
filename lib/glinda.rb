@@ -190,7 +190,7 @@ module Glinda
           tag_list += tags
         end
       end
-      return tag_list
+      return tag_list.uniq
     end
 
     if defined? NewRelic
