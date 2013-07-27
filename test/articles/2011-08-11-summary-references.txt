@@ -1,0 +1,16 @@
+---
+title: Summary References
+date: 11/08/2011
+
+Testing [link][1] [references][2] defined in and after after [summary][3].
+Here we go!
+
+[1]: http://cloudhead.io/toto#is-awesome
+
+~
+
+Here we go again!
+
+[2]: http://example.com/ "Example stub"
+[3]: http://en.wikipedia.org/wiki/Summary
+  "Wiki article"
