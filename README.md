@@ -33,7 +33,7 @@ how it works
 ------------
 
 - content is entirely managed through **git**; you get full fledged version control for free.
-- articles are stored as _.txt_ files, with embeded metadata (in yaml format).
+- articles are stored as _.txt_ files, with embedded metadata (in yaml format).
 - articles are processed through a markdown converter (rdiscount) by default.
 - templating is done through **ERB**.
 - toto is built right on top of **Rack**.
@@ -41,7 +41,7 @@ how it works
 - toto was built with heroku in mind.
 - comments are handled by [disqus](http://disqus.com)
 - individual articles can be accessed through urls such as _/2009/11/21/blogging-with-toto_
-- the archives can be accessed by year, month or day, wih the same format as above.
+- the archives can be accessed by year, month or day, with the same format as above.
 - arbitrary metadata can be included in articles files, and accessed from the templates.
 - summaries are generated intelligently by toto, following the `:max` setting you give it.
 - you can also define how long your summary is, by adding `~` at the end of it (`:delim`).
