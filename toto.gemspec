@@ -8,10 +8,10 @@ Gem::Specification.new do |s|
   s.version = "0.4.9"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.authors = ["cloudhead"]
-  s.date = %q{2010-12-01}
+  s.authors = ["cloudhead", "endel"]
+  s.date = %q{2011-04-27}
   s.description = %q{the tiniest blog-engine in Oz.}
-  s.email = %q{self@cloudhead.net}
+  s.email = %q{talk@endel.me}
   s.extra_rdoc_files = [
     "LICENSE",
      "README.md"
@@ -44,7 +44,7 @@ Gem::Specification.new do |s|
      "test/toto_test.rb",
      "toto.gemspec"
   ]
-  s.homepage = %q{http://github.com/cloudhead/toto}
+  s.homepage = %q{http://github.com/endel/toto}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.5}
