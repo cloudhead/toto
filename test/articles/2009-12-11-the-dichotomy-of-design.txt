@@ -1,4 +1,5 @@
 title: the wizard of oz
+tags: wonderful, toto
 date: 12/10/1932
 
 Once upon a time...

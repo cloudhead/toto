@@ -1,4 +1,4 @@
-require 'test/test_helper'
+require File.expand_path File.join(File.dirname(__FILE__), 'test_helper')
 require 'date'
 
 URL = "http://toto.oz"
@@ -21,6 +21,7 @@ context Toto do
     asserts("content type is set properly") { topic.content_type }.equals "text/html"
     should("include a couple of article")   { topic.body }.includes_elements("#articles li", 3)
     should("include an archive")            { topic.body }.includes_elements("#archives li", 2)
+    should("include tags cloud")            { topic.body }.includes_elements("#tags-cloud li", 3)
 
     context "with no articles" do
       setup { Rack::MockRequest.new(Toto::Server.new(@config.merge(:ext => 'oxo'))).get('/') }
@@ -59,6 +60,8 @@ context Toto do
     asserts("returns a 200")                { topic.status }.equals 200
     asserts("content type is set properly") { topic.content_type }.equals "text/html"
     should("contain the article")           { topic.body }.includes_html("p" => /<em>Once upon a time<\/em>/)
+    should("contain tags of article")       { topic.body }.includes_elements("#tags span", 2)
+    should("contain tags cloud")            { topic.body }.includes_elements("#tags-cloud li", 3)
   end
 
   context "GET to the archive" do
@@ -108,6 +111,62 @@ context Toto do
     asserts("contain the env variable")           { topic.body }.includes_html("p" => /env passed: true/)
     asserts("access the http get parameter")           { topic.body }.includes_html("p" => /request method type: GET/)
     asserts("access the http parameter name value pair")           { topic.body }.includes_html("p" => /request name value pair: param=testparam/)
+  end
+
+
+
+  context "TagCloud nubes" do
+    setup do
+      tags = Toto::TagCloud.new([ Toto::Article.new(:tags => ['wizards', 'magic']),
+                                  Toto::Article.new(:tags => ['wizards', 'voodoo']),
+                                  Toto::Article.new(:tags => ['magic', 'black']),
+                                  Toto::Article.new(:tags => ['wizards', 'black']),
+                                  Toto::Article.new(:tags => ['wizards']),
+                                  Toto::Article.new(:tags => ['wizards']),
+                                  Toto::Article.new(:tags => ['wizards']),
+                                  Toto::Article.new(:tags => ['wizards']),
+                                  Toto::Article.new(:tags => ['wizards']),
+                                  Toto::Article.new(:tags => ['wizards']) ])
+    end
+
+    asserts("weight depends on amount of tag usage") { topic['wizards'].weight > topic['voodoo'].weight }
+    asserts("the most heaviest tag has weight of 8") { topic['wizards'].weight }.equals 8
+    asserts("the most lightest tag has weight of 0") { topic['voodoo'].weight }.equals 0
+
+    context "as snowball" do
+      setup { topic.snowball }
+      asserts("is an array") { topic.is_a? Array }
+      should("have most heaviest tag in the middle") { topic.at(1).weight }.equals 8
+    end
+  end
+
+  context "Article" do
+    context "without tags" do
+      setup { Toto::Article.new({ :body => "" }, @config) }
+      asserts("has tags property") { not topic[:tags].nil? }
+      asserts("which is an array") { topic[:tags].is_a? Array }
+      should("have empty tags") { topic.tags.length }.equals 0
+    end
+
+    context "with tags" do
+      setup { Toto::Article.new "#{Toto::Paths[:articles]}/1900-05-17-the-wonderful-wizard-of-oz.txt", @config }
+      asserts("has tags property") { !topic[:tags].nil? }
+      asserts("which is an array") { topic[:tags].is_a? Array }
+      should("have elements") { topic.tags.length }.equals 2
+    end
+  end
+
+  context "GET /tag/oz-wizards (tagged aticles)" do
+    setup { @toto.get('/tag/oz-wizards') }
+    asserts("returns a 200") { topic.status }.equals 200 
+    asserts("body is not empty") { not topic.body.empty? }
+    should("includes only the entries for that tag") { topic.body }.includes_elements("#tagged-articles > li", 2)
+    should("has access to @tag") { topic.body }.includes_html("#tag" => /oz-wizards/)
+  end
+
+  context "GET /tag/ (no tag specified)" do
+    setup { @toto.get('/tag/') }
+    asserts("returns a 400") { topic.status }.equals 400 
   end
 
 

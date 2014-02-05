@@ -1,4 +1,9 @@
 <html>
   <%= yield %>
+  <ul id="tags-cloud">
+    <% for tag in tags_cloud %>
+      <li><%= tag %></li>
+    <% end %>
+  </ul>
 </html>
 

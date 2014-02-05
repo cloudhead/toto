@@ -1,4 +1,8 @@
 <h2><%= title %></h2>
 <span><%= date %></h2>
 <p><%= body %></p>
-
+<div id="tags">
+  <% for tag in tags %>
+    <span><%= tag %></span>
+  <% end %>
+</div>

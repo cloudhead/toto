@@ -14,35 +14,36 @@ Gem::Specification.new do |s|
   s.email = %q{self@cloudhead.net}
   s.extra_rdoc_files = [
     "LICENSE",
-     "README.md"
+    "README.md"
   ]
   s.files = [
     ".document",
-     ".gitignore",
-     "LICENSE",
-     "README.md",
-     "Rakefile",
-     "TODO",
-     "VERSION",
-     "lib/ext/ext.rb",
-     "lib/toto.rb",
-     "test/articles/1900-05-17-the-wonderful-wizard-of-oz.txt",
-     "test/articles/2001-01-01-two-thousand-and-one.txt",
-     "test/articles/2009-04-01-tilt-factor.txt",
-     "test/articles/2009-12-04-some-random-article.txt",
-     "test/articles/2009-12-11-the-dichotomy-of-design.txt",
-     "test/autotest.rb",
-     "test/templates/about.rhtml",
-     "test/templates/archives.rhtml",
-     "test/templates/article.rhtml",
-     "test/templates/feed.builder",
-     "test/templates/index.builder",
-     "test/templates/index.rhtml",
-     "test/templates/layout.rhtml",
-     "test/templates/repo.rhtml",
-     "test/test_helper.rb",
-     "test/toto_test.rb",
-     "toto.gemspec"
+    ".gitignore",
+    "LICENSE",
+    "README.md",
+    "Rakefile",
+    "TODO",
+    "VERSION",
+    "lib/ext/ext.rb",
+    "lib/toto.rb",
+    "test/articles/1900-05-17-the-wonderful-wizard-of-oz.txt",
+    "test/articles/2001-01-01-two-thousand-and-one.txt",
+    "test/articles/2009-04-01-tilt-factor.txt",
+    "test/articles/2009-12-04-some-random-article.txt",
+    "test/articles/2009-12-11-the-dichotomy-of-design.txt",
+    "test/autotest.rb",
+    "test/templates/about.rhtml",
+    "test/templates/archives.rhtml",
+    "test/templates/article.rhtml",
+    "test/templates/feed.builder",
+    "test/templates/index.builder",
+    "test/templates/index.rhtml",
+    "test/templates/layout.rhtml",
+    "test/templates/repo.rhtml",
+    "test/templates/tag.rhtml",
+    "test/test_helper.rb",
+    "test/toto_test.rb",
+    "toto.gemspec"
   ]
   s.homepage = %q{http://github.com/cloudhead/toto}
   s.rdoc_options = ["--charset=UTF-8"]

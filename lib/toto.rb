@@ -78,15 +78,29 @@ module Toto
       end}.merge archives
     end
 
-    def archives filter = ""
-      entries = ! self.articles.empty??
-        self.articles.select do |a|
-          filter !~ /^\d{4}/ || File.basename(a) =~ /^#{filter}/
-        end.reverse.map do |article|
-          Article.new article, @config
-        end : []
+    def archives opts = {}
+      opts = {:filter => opts} unless opts.is_a?(Hash)
+      entries = self.articles || []
 
-      return :archives => Archives.new(entries, @config)
+      # entries: array of filenames
+      if !(filter = opts[:filter]).nil?
+        entries = entries.select do |filename|
+          filter !~ /^\d{4}/ || File.basename(filename) =~ /^#{filter}/
+        end
+      end
+
+      # load entries
+      entries.reverse!.map! { |filename| Article.new(filename, @config) }
+
+      # entries: array of artices
+      if !(tag = opts.delete(:tag)).nil?
+        opts[:tag] = Tag.new(tag, @config)
+        entries = entries.select do |article|
+          !article[:tags].nil? && article[:tags].find{|tag| tag.slug == opts[:tag].slug}
+        end
+      end
+
+      opts.merge({:archives => Archives.new(entries, @config)})
     end
 
     def article route
@@ -113,6 +127,9 @@ module Toto
               context[article(route), :article]
             else http 400
           end
+        elsif route.first.to_sym == :tag
+          if 2 == route.size then context[archives(:tag => route.last), :tag]
+          else http 400; end
         elsif respond_to?(path)
           context[send(path, type), path.to_sym]
         elsif (repo = @config[:github][:repos].grep(/#{path}/).first) &&
@@ -147,13 +164,14 @@ module Toto
 
     class Context
       include Template
-      attr_reader :env
+      attr_reader :env, :tags_cloud
 
       def initialize ctx = {}, config = {}, path = "/", env = {}
         @config, @context, @path, @env = config, ctx, path, env
         @articles = Site.articles(@config[:ext]).reverse.map do |a|
           Article.new(a, @config)
         end
+        @tags_cloud = TagCloud.new(@articles, @config)
 
         ctx.each do |k, v|
           meta_def(k) { ctx.instance_of?(Hash) ? v : ctx.send(k) }
@@ -239,7 +257,11 @@ module Toto
 
       self.taint
       self.update data
+      self[:tags] = self[:tags].to_s.split(',') unless self[:tags].is_a? Array
       self[:date] = Date.parse(self[:date].gsub('/', '-')) rescue Date.today
+
+      self[:tags].map!{|str| Tag.new(str, @config)}
+
       self
     end
 
@@ -273,6 +295,10 @@ module Toto
 
     def path
       "/#{@config[:prefix]}#{self[:date].strftime("/%Y/%m/%d/#{slug}/")}".squeeze('/')
+    end
+
+    def tags
+      self[:tags]
     end
 
     def title()   self[:title] || "an article"               end
@@ -352,6 +378,79 @@ module Toto
 
       @response.status = response[:status]
       @response.finish
+    end
+  end
+
+  class Tag
+    attr_reader :title, :slug
+
+    def initialize title, config = {}
+      @config = config
+      @title = title.strip
+      @slug = Tag.slugize(@title)
+    end
+
+    def to_s
+      @slug
+    end
+
+    def url
+      "http://#{(@config[:url].sub("http://", '') + self.path).squeeze('/')}"
+    end
+    alias :permalink url
+
+    def path
+      "/#{@config[:prefix]}tag/#{@slug}"
+    end
+
+    def self.slugize obj
+      obj.to_s.strip.slugize
+    end
+  end
+
+  class TagCloud < Hash
+    class Nube < Tag
+      attr_accessor :count, :weight
+      def initialize tag, config
+        @count, @weight = 1, 0
+        super tag.title, config
+      end
+    end
+
+    def initialize articles, config = {}
+      # fill-in tags
+      articles.each do |article|
+        article.tags.each do |tag|
+          unless self[tag.slug].nil?
+            self[tag.slug].count += 1
+          else
+            self[tag.slug] = Nube.new(tag, config)
+          end
+        end
+      end
+
+      # get min/max bounds
+      cnt = self.values.collect{|nube| nube.count}
+      min = cnt.min.to_i
+      max = cnt.max.to_i
+
+      # get correction rate
+      rate = (max - min) / 9 + 1
+
+      # calculate weight
+      self.each_value {|nube| nube.weight = (nube.count - min) / rate}
+    end
+
+    def [] key
+      super Tag.slugize(key)
+    end
+
+    def snowball
+      ball, ops = [], [:push, :unshift]
+      self.values.sort!{|a,b| b.count <=> a.count}.each do |nube|
+        ball.send ops.rotate!.first, nube
+      end
+      ball
     end
   end
 end
