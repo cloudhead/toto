@@ -1,0 +1,4 @@
+title: With a valid date not today
+date: 2011-08-01
+
+If the metadata contains a valid date the YAML.load call with parse the date into an actual datetime object.

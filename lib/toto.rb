@@ -239,7 +239,9 @@ module Toto
 
       self.taint
       self.update data
-      self[:date] = Date.parse(self[:date].gsub('/', '-')) rescue Date.today
+      unless self[:date].is_a? Date
+        self[:date] = Date.parse(self[:date].gsub('/', '-')) rescue Date.today
+      end
       self
     end
 
