@@ -9,7 +9,7 @@ if RUBY_PLATFORM =~ /win32/
   require 'maruku'
   Markdown = Maruku
 else
-  require 'rdiscount'
+  require 'redcarpet'
 end
 
 require 'builder'
@@ -61,6 +61,7 @@ module Toto
   class Site
     def initialize config
       @config = config
+      @tagcloud = Array.new
     end
 
     def [] *args
@@ -74,8 +75,9 @@ module Toto
     def index type = :html
       articles = type == :html ? self.articles.reverse : self.articles
       {:articles => articles.map do |article|
-        Article.new article, @config
-      end}.merge archives
+          Article.new article, @config
+        end.sort_by{|article| article.date}
+      }.merge archives
     end
 
     def archives filter = ""
@@ -85,14 +87,19 @@ module Toto
         end.reverse.map do |article|
           Article.new article, @config
         end : []
-
       return :archives => Archives.new(entries, @config)
     end
-
+    
     def article route
       Article.new("#{Paths[:articles]}/#{route.join('-')}.#{self[:ext]}", @config).load
     end
-
+    
+    def category route
+      index
+    end
+    def tag
+      index
+    end
     def /
       self[:root]
     end
@@ -103,18 +110,25 @@ module Toto
       context = lambda do |data, page|
         Context.new(data, @config, path, env).render(page, type)
       end
-
       body, status = if Context.new.respond_to?(:"to_#{type}")
         if route.first =~ /\d{4}/
           case route.size
             when 1..3
-              context[archives(route * '-'), :archives]
+              last_item = Integer(route.last) rescue route.last
+              if(last_item.is_a? Fixnum)
+                context[archives(route * '-'), :archives]
+              else
+                context[article(route), :article]
+              end
             when 4
               context[article(route), :article]
             else http 400
           end
-        elsif respond_to?(path)
+        elsif respond_to?(path) 
           context[send(path, type), path.to_sym]
+        elsif respond_to?(path.split('/').first)
+          m = path.split('/').first 
+          context[archives(route * '-'), m]
         elsif (repo = @config[:github][:repos].grep(/#{path}/).first) &&
               !@config[:github][:user].empty?
           context[Repo.new(repo, @config), :repo]
@@ -147,14 +161,15 @@ module Toto
 
     class Context
       include Template
-      attr_reader :env
+      attr_reader :env, :categories, :tags_cloud
 
       def initialize ctx = {}, config = {}, path = "/", env = {}
         @config, @context, @path, @env = config, ctx, path, env
         @articles = Site.articles(@config[:ext]).reverse.map do |a|
           Article.new(a, @config)
         end
-
+        @categories = Categories.new(@articles,@config)
+        @tags_cloud = TagCloud.new(@articles,@config)
         ctx.each do |k, v|
           meta_def(k) { ctx.instance_of?(Hash) ? v : ctx.send(k) }
         end
@@ -203,7 +218,7 @@ module Toto
     include Template
 
     def initialize articles, config
-      self.replace articles
+      self.replace articles.sort_by{|article| article.date}
       @config = config
     end
 
@@ -221,22 +236,22 @@ module Toto
   class Article < Hash
     include Template
 
-    def initialize obj, config = {}
+    def initialize obj, config = {} 
       @obj, @config = obj, config
       self.load if obj.is_a? Hash
     end
 
-    def load
+    def load 
       data = if @obj.is_a? String
         meta, self[:body] = File.read(@obj).split(/\n\n/, 2)
 
         # use the date from the filename, or else toto won't find the article
         @obj =~ /\/(\d{4}-\d{2}-\d{2})[^\/]*$/
-        ($1 ? {:date => $1} : {}).merge(YAML.load(meta))
+        meta = YAML.load(meta)
+        ($1 ? {:date => $1} : {}).merge(meta)
       elsif @obj.is_a? Hash
         @obj
       end.inject({}) {|h, (k,v)| h.merge(k.to_sym => v) }
-
       self.taint
       self.update data
       self[:date] = Date.parse(self[:date].gsub('/', '-')) rescue Date.today
@@ -272,16 +287,22 @@ module Toto
     end
 
     def path
-      "/#{@config[:prefix]}#{self[:date].strftime("/%Y/%m/%d/#{slug}/")}".squeeze('/')
+      if(@config[:suffix]=='/')
+        return "/#{@config[:prefix]}#{self[:date].strftime("/#{@config[:dateformat]}/#{slug}/")}".squeeze('/')
+      else
+        return "/#{@config[:prefix]}#{self[:date].strftime("/#{@config[:dateformat]}/#{slug}/")}".squeeze('/').chomp('/') + @config[:suffix]
+      end
     end
 
     def title()   self[:title] || "an article"               end
     def date()    @config[:date].call(self[:date])           end
     def author()  self[:author] || @config[:author]          end
     def to_html() self.load; super(:article, @config)        end
+    def category() self[:category] || nil                    end
+    def tags()    self[:tags] ? self[:tags].split(',').map { |i|  i.strip  } : '' end       
+    
     alias :to_s to_html
   end
-
   class Config < Hash
     Defaults = {
       :author => ENV['USER'],                               # blog author
@@ -301,7 +322,9 @@ module Toto
       },
       :error => lambda {|code|                              # The HTML for your error page
         "<font style='font-size:300%'>toto, we're not in Kansas anymore (#{code})</font>"
-      }
+      },
+      :suffix => '/',
+      :dateformat => '%Y/%m/%d'
     }
     def initialize obj
       self.update Defaults
@@ -352,6 +375,37 @@ module Toto
 
       @response.status = response[:status]
       @response.finish
+    end
+  end
+  
+  # tagcloud class, @todo add more features
+  class TagCloud < Array
+    def initialize articles,config
+      @articles = articles
+      @config   = config
+    end
+    
+    def snowball
+      @articles.map {|article| article.tags.to_s.split('/')}.flatten.uniq.sort
+    end
+    
+    def path obj
+      '/tag/' + obj.to_s
+    end
+  end
+  ## category class, need to add more features
+  class Categories < Array
+    def initialize articles,config
+      @articles = articles
+      @config   = config
+    end
+    
+    def cloud
+      @articles.map { |article| article.category.split('/')}.flatten.uniq.sort
+    end
+    
+    def path obj
+      '/category/' + obj.to_s
     end
   end
 end
