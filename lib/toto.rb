@@ -232,7 +232,7 @@ module Toto
 
         # use the date from the filename, or else toto won't find the article
         @obj =~ /\/(\d{4}-\d{2}-\d{2})[^\/]*$/
-        ($1 ? {:date => $1} : {}).merge(YAML.load(meta))
+        ($1 ? {:date => $1} : {}).merge(load_front(meta))
       elsif @obj.is_a? Hash
         @obj
       end.inject({}) {|h, (k,v)| h.merge(k.to_sym => v) }
@@ -280,6 +280,12 @@ module Toto
     def author()  self[:author] || @config[:author]          end
     def to_html() self.load; super(:article, @config)        end
     alias :to_s to_html
+    
+    private
+    def load_front(meta)
+      matter = YAML.load(meta)
+      matter.is_a?(Hash) ? matter : {:title => @obj.to_s, :body => "Failed to parse front matter : #{meta}"}
+    end
   end
 
   class Config < Hash

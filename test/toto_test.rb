@@ -51,7 +51,7 @@ context Toto do
     setup { @toto.get('/about') }
     asserts("returns a 200")                { topic.status }.equals 200
     asserts("body is not empty")            { not topic.body.empty? }
-    should("have access to @articles")      { topic.body }.includes_html("#count" => /5/)
+    should("have access to @articles")      { topic.body }.includes_html("#count" => /6/)
   end
 
   context "GET a single article" do
@@ -240,6 +240,15 @@ context Toto do
         end
 
         should("be in the directory") { topic.path }.equals Date.today.strftime("/blog/%Y/%m/%d/toto-and-the-wizard-of-oz/")
+      end
+      
+      context "damaged article" do
+        setup do
+          conf = Toto::Config.new({})
+          damaged = File.expand_path('../articles/2011-01-24-damage.txt', __FILE__)
+          Toto::Article.new(damaged, conf)
+        end
+        should("load with a damaged body") {topic.load[:body]}.matches(/^Failed to parse front matter/)
       end
     end
   end
