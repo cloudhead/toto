@@ -5,9 +5,8 @@ require 'rack'
 require 'digest'
 require 'open-uri'
 
-if RUBY_PLATFORM =~ /win32/
+if RUBY_PLATFORM =~ /win32|java/
   require 'maruku'
-  Markdown = Maruku
 else
   require 'rdiscount'
 end
@@ -41,7 +40,11 @@ module Toto
 
     def markdown text
       if (options = @config[:markdown])
-        Markdown.new(text.to_s.strip, *(options.eql?(true) ? [] : options)).to_html
+        if RUBY_PLATFORM =~ /win32|java/
+          Maruku.new(text.to_s.strip).to_html
+        else
+          Markdown.new(text.to_s.strip, *(options.eql?(true) ? [] : options)).to_html
+        end
       else
         text.strip
       end
