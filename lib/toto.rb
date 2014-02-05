@@ -82,9 +82,11 @@ module Toto
       entries = ! self.articles.empty??
         self.articles.select do |a|
           filter !~ /^\d{4}/ || File.basename(a) =~ /^#{filter}/
-        end.reverse.map do |article|
+        end.map do |article|
           Article.new article, @config
-        end : []
+        end.sort_by do |article|
+          article[:date].strftime("%Y%m%d%H%M%S-#{article.slug}")
+        end.reverse : []
 
       return :archives => Archives.new(entries, @config)
     end
@@ -151,9 +153,11 @@ module Toto
 
       def initialize ctx = {}, config = {}, path = "/", env = {}
         @config, @context, @path, @env = config, ctx, path, env
-        @articles = Site.articles(@config[:ext]).reverse.map do |a|
+        @articles = Site.articles(@config[:ext]).map do |a|
           Article.new(a, @config)
-        end
+        end.sort_by do |article|
+          article[:date].strftime("%Y%m%d%H%M%S-#{article.slug}")
+        end.reverse
 
         ctx.each do |k, v|
           meta_def(k) { ctx.instance_of?(Hash) ? v : ctx.send(k) }
@@ -239,7 +243,7 @@ module Toto
 
       self.taint
       self.update data
-      self[:date] = Date.parse(self[:date].gsub('/', '-')) rescue Date.today
+      self[:date] = DateTime.parse(self[:date].gsub('/', '-')) rescue DateTime.now
       self
     end
 

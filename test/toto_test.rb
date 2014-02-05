@@ -51,7 +51,7 @@ context Toto do
     setup { @toto.get('/about') }
     asserts("returns a 200")                { topic.status }.equals 200
     asserts("body is not empty")            { not topic.body.empty? }
-    should("have access to @articles")      { topic.body }.includes_html("#count" => /5/)
+    should("have access to @articles")      { topic.body }.includes_html("#count" => /7/)
   end
 
   context "GET a single article" do
@@ -65,13 +65,13 @@ context Toto do
     context "through a year" do
       setup { @toto.get('/2009') }
       asserts("returns a 200")                     { topic.status }.equals 200
-      should("includes the entries for that year") { topic.body }.includes_elements("li.entry", 3)
+      should("includes the entries for that year") { topic.body }.includes_elements("li.entry", 5)
     end
 
     context "through a year & month" do
       setup { @toto.get('/2009/12') }
       asserts("returns a 200")                      { topic.status }.equals 200
-      should("includes the entries for that month") { topic.body }.includes_elements("li.entry", 2)
+      should("includes the entries for that month") { topic.body }.includes_elements("li.entry", 4)
       should("includes the year & month")           { topic.body }.includes_html("h1" => /2009\/12/)
     end
 
@@ -79,6 +79,35 @@ context Toto do
       setup { @toto.get('/archive') }
     end
   end
+
+
+  context "when time of article specified" do
+    context "article with time" do
+      setup do
+        Toto::Article.new({
+          :title  => "The Wizard of Oz",
+          :date   => "19/10/1976 10:30"
+        }, @config)
+      end
+
+      should("not have time in the URL") { topic.path }.equals "/1976/10/19/the-wizard-of-oz/"
+      should("have time accessible") { [topic[:date].hour, topic[:date].min] }.equals [10, 30]
+    end
+
+    context "article without time" do
+      setup do
+        Toto::Article.new({ :date => "19/10/1976" }, @config)
+      end
+
+      should("have time equal 00:00") { [topic[:date].hour, topic[:date].min] }.equals [0, 0]
+    end
+
+    context "when articles are sorted" do
+      setup { @toto.get('/2009/12/11') }
+      should("earliest time comes first") { topic.body }.includes_html("#article-1" => /another post/)
+    end
+  end
+
 
   context "GET to an unknown route with a custom error" do
     setup do
@@ -154,7 +183,7 @@ context Toto do
       should("have a title")               { topic.title }.equals "Toto & The Wizard of Oz."
       should("parse the body as markdown") { topic.body }.equals "<h1>Chapter I</h1>\n\n<p>hello, <em>stranger</em>.</p>\n"
       should("create an appropriate slug") { topic.slug }.equals "toto-and-the-wizard-of-oz"
-      should("set the date")               { topic.date }.equals "the time is #{Date.today.strftime("%Y/%m/%d %H:%M")}"
+      should("set the date")               { topic.date }.equals "the time is #{DateTime.now.strftime("%Y/%m/%d %H:%M")}"
       should("create a summary")           { topic.summary == topic.body }
       should("have an author")             { topic.author }.equals AUTHOR
       should("have a path")                { topic.path }.equals Date.today.strftime("/%Y/%m/%d/toto-and-the-wizard-of-oz/")
