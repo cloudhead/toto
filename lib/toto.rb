@@ -254,12 +254,13 @@ module Toto
 
     def summary length = nil
       config = @config[:summary]
+      config[:suffix] ||= Config::Defaults[:summary][:suffix]
       sum = if self[:body] =~ config[:delim]
         self[:body].split(config[:delim]).first
       else
         self[:body].match(/(.{1,#{length || config[:length] || config[:max]}}.*?)(\n|\Z)/m).to_s
       end
-      markdown(sum.length == self[:body].length ? sum : sum.strip.sub(/\.\Z/, '&hellip;'))
+      markdown(sum.length == self[:body].length ? sum : sum.strip.sub(/\.\Z/, config[:suffix].call(self)))
     end
 
     def url
@@ -292,7 +293,7 @@ module Toto
       :date => lambda {|now| now.strftime("%d/%m/%Y") },    # date function
       :markdown => :smart,                                  # use markdown
       :disqus => false,                                     # disqus name
-      :summary => {:max => 150, :delim => /~\n/},           # length of summary and delimiter
+      :summary => {:max => 150, :delim => /~\n/, :suffix => lambda {|article| "&hellip;" }}, # length of summary, delimiter and what to suffix
       :ext => 'txt',                                        # extension for articles
       :cache => 28800,                                      # cache duration (seconds)
       :github => {:user => "", :repos => [], :ext => 'md'}, # Github username and list of repos

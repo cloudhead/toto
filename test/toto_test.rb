@@ -1,4 +1,4 @@
-require 'test/test_helper'
+require File.expand_path File.join(File.dirname(__FILE__), 'test_helper')
 require 'date'
 
 URL = "http://toto.oz"
@@ -190,6 +190,20 @@ context Toto do
 
       context "and long first paragraph" do
         should("create a valid summary") { topic.summary }.equals "<p>" + ("a little bit of text." * 5).chop + "&hellip;</p>\n"
+
+        context "and a custom summary suffix" do
+          setup do
+            Toto::Article.new({
+              :title  => "The Wizard of Oz",
+              :body   => ("a little bit of text." * 5) + "\n" + "filler" * 10,
+              :date   => "19/10/1976",
+              :slug   => "wizard-of-oz",
+              :author => "toetoe"
+            }, @config.merge(:summary => {:length => 50, :suffix => lambda {|article| "More: " + article.author }}))
+          end
+          
+          should("suffix the summary with the custom lambda") { topic.summary }.matches(/More: toetoe<\/p>\n$/)
+       end
       end
 
       context "and a short first paragraph" do
