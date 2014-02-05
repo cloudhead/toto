@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.authors = ["cloudhead"]
   s.date = %q{2010-12-01}
   s.description = %q{the tiniest blog-engine in Oz.}
-  s.email = %q{self@cloudhead.net}
+  s.email = %q{self@cloudhead.net, mail@5v3n.com}
   s.extra_rdoc_files = [
     "LICENSE",
      "README.md"
@@ -44,7 +44,7 @@ Gem::Specification.new do |s|
      "test/toto_test.rb",
      "toto.gemspec"
   ]
-  s.homepage = %q{http://github.com/cloudhead/toto}
+  s.homepage = %q{http://github.com/5v3n/toto}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.5}

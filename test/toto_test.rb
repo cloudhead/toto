@@ -1,4 +1,4 @@
-require 'test/test_helper'
+require 'test_helper'
 require 'date'
 
 URL = "http://toto.oz"
@@ -101,6 +101,7 @@ context Toto do
     asserts("body should be valid xml")     { topic.body }.includes_html("feed > entry" => /.+/)
     asserts("summary shouldn't be empty")   { topic.body }.includes_html("summary" => /.{10,}/)
   end
+
   context "GET /index?param=testparam (get parameter)" do
     setup { @toto.get('/index?param=testparam')   }
     asserts("returns a 200")                { topic.status }.equals 200
