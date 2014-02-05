@@ -1,3 +1,5 @@
+require 'iconv'
+
 class Object
   def meta_def name, &blk
     (class << self; self; end).instance_eval do
@@ -7,8 +9,15 @@ class Object
 end
 
 class String
-  def slugize
-    self.downcase.gsub(/&/, 'and').gsub(/\s+/, '-').gsub(/[^a-z0-9-]/, '')
+  # http://websideattractions.com/2008/11/06/squish-the-slug-the-rails-way
+  def slugize(slug='-')
+    slugged = Iconv.iconv('ascii//TRANSLIT//IGNORE', 'utf-8', self).to_s
+    slugged.gsub!(/&/, 'and')
+    slugged.gsub!(/[^\w_\-#{Regexp.escape(slug)}]+/i, slug)
+    slugged.gsub!(/#{slug}{2,}/i, slug)
+    slugged.gsub!(/^#{slug}|#{slug}$/i, '')
+    slugged.downcase!
+    URI.escape(slugged, /[^\w_+-]/i)
   end
 
   def humanize
