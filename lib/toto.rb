@@ -279,7 +279,7 @@ module Toto
 
     def footnotes
       @footnotes = self[:body].scan(/ \(\( (.*) \)\)/)
-      @footnotes.collect! {|x| (((markdown x[0]).sub! '<p>' '').sub! '</p>', '').strip}
+      @footnotes.collect! {|x| (((markdown x[0]).sub! '<p>' '').sub! '</p>' '').strip}
     end
 
     def path
