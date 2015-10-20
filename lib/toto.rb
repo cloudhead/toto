@@ -277,11 +277,6 @@ module Toto
       markdown self[:body].sub(@config[:summary][:delim], '') rescue markdown self[:body]
     end
 
-    def footnotes
-      @footnotes = self[:body].scan(/ \(\( (.*) \)\)/)
-      @footnotes.collect! {|x| (((markdown x[0]).sub! '<p>' '').sub! '</p>' '').strip}
-    end
-
     def path
       "/#{@config[:prefix]}#{self[:date].strftime("/%Y/%m/%d/#{slug}/")}".squeeze('/')
     end
