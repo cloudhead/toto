@@ -278,7 +278,7 @@ module Toto
     end
 
     def footnotes
-      self[:body].scan(/ \(\( (.*) \)\) /)
+      self[:body].scan(/ \(\( (.*) \)\)/)
     end
 
     def path
