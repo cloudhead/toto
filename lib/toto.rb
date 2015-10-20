@@ -97,6 +97,12 @@ module Toto
       self[:root]
     end
 
+    def sitemap type = :xml
+      {:articles => self.articles.map do |article|
+        Article.new article, @config
+      end}
+    end
+
     def go route, env = {}, type = :html
       route << self./ if route.empty?
       type, path = type =~ /html|xml|json/ ? type.to_sym : :html, route.join('/')
@@ -355,4 +361,3 @@ module Toto
     end
   end
 end
-
