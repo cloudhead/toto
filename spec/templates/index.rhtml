@@ -3,6 +3,11 @@
     <li><%= article %></li>
   <% end %>
 </ul>
+<ul id="tag_list">
+  <% tag_list.each do |tag| %>
+    <li><%= tag %></li>
+  <% end %>
+</ul>
 <div id="archives">
   <%= archives[3...5] %>
 </div>

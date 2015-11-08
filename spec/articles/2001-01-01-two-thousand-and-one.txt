@@ -1,5 +1,6 @@
 title: the wizard of oz
 date: 12/10/1932
+tags: lions, tigers, bears
 
 Once upon a time...
 
