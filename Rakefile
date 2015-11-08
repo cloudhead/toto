@@ -4,13 +4,13 @@ require 'rake'
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
-    gem.name = "toto"
-    gem.summary = %Q{the tiniest blog-engine in Oz}
-    gem.description = %Q{the tiniest blog-engine in Oz.}
-    gem.email = "self@cloudhead.net"
-    gem.homepage = "http://github.com/cloudhead/toto"
-    gem.authors = ["cloudhead"]
-    gem.add_development_dependency "riot"
+    gem.name = "glinda"
+    gem.summary = %Q{Toto, expanded}
+    gem.description = %Q{Toto, expanded}
+    gem.email = "ryan@slingingcode.com"
+    gem.homepage = "http://github.com/rschmukler/glinda"
+    gem.authors = ["rschmukler"]
+    gem.add_development_dependency "rspec"
     gem.add_dependency "builder"
     gem.add_dependency "rack"
     if RUBY_PLATFORM =~ /win32/
@@ -24,12 +24,8 @@ rescue LoadError
   puts "Jeweler (or a dependency) not available. Install it with: sudo gem install jeweler"
 end
 
-require 'rake/testtask'
-Rake::TestTask.new(:test) do |test|
-  test.libs << 'lib' << 'test'
-  test.pattern = 'test/**/*_test.rb'
-  test.verbose = true
-end
+require 'rspec/core/rake_task'
 
-task :test => :check_dependencies
-task :default => :test
+RSpec::Core::RakeTask.new(:spec)
+
+task :default => :spec

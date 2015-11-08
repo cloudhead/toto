@@ -5,6 +5,18 @@ require 'rack'
 require 'digest'
 require 'open-uri'
 
+begin
+  require 'newrelic_rpm'
+  require 'new_relic/agent/instrumentation/rack'
+  require 'new_relic/agent/instrumentation/controller_instrumentation'
+  ERB.class_eval do
+    include NewRelic::Agent::MethodTracer
+    add_method_tracer :initialize
+    add_method_tracer :result
+  end
+rescue LoadError
+end
+
 if RUBY_PLATFORM =~ /win32/
   require 'maruku'
   Markdown = Maruku
@@ -18,7 +30,7 @@ $:.unshift File.dirname(__FILE__)
 
 require 'ext/ext'
 
-module Toto
+module Glinda
   Paths = {
     :templates => "templates",
     :pages => "templates/pages",
@@ -59,6 +71,7 @@ module Toto
   end
 
   class Site
+
     def initialize config
       @config = config
     end
@@ -75,10 +88,11 @@ module Toto
       articles = type == :html ? self.articles.reverse : self.articles
       {:articles => articles.map do |article|
         Article.new article, @config
-      end}.merge archives
+      end}.merge(archives)
     end
 
-    def archives filter = ""
+
+    def archives filter = "", tag = nil
       entries = ! self.articles.empty??
         self.articles.select do |a|
           filter !~ /^\d{4}/ || File.basename(a) =~ /^#{filter}/
@@ -86,7 +100,20 @@ module Toto
           Article.new article, @config
         end : []
 
-      return :archives => Archives.new(entries, @config)
+      if tag.nil?
+        return :archives => Archives.new(entries, @config)
+      else
+        tagged_entries = entries.select do |e|
+          if e[:tags]
+            tags = e[:tags].split(',').map(&:strip).map(&:slugize)
+            tags.include? tag.slugize
+          else
+            false
+          end
+        end
+
+        return :archives => Archives.new(tagged_entries, @config), :tag => tag
+      end
     end
 
     def article route
@@ -118,6 +145,13 @@ module Toto
             when 4
               context[article(route), :article]
             else http 400
+          end
+        elsif route.first == 'tags'
+          data = {}
+          if route.length == 2
+            context[archives("", route[1]), :tags]
+          else
+            context[{tag: nil}, :tags]
           end
         elsif respond_to?(path)
           context[send(path, type), path.to_sym]
@@ -151,8 +185,35 @@ module Toto
       Dir["#{Paths[:articles]}/*.#{ext}"].sort_by {|entry| File.basename(entry) }
     end
 
+    def self.tag_list(ext)
+      tag_list = []
+      if !self.articles(ext).empty?
+        entries = self.articles(ext).map do |article|
+          Article.new(article, @config)
+        end
+
+        entries.map(&:tags).each do |tags|
+          tag_list += tags
+        end
+      end
+      return tag_list.uniq
+    end
+
+    if defined? NewRelic
+      include NewRelic::Agent::MethodTracer
+      add_method_tracer :index
+      add_method_tracer :archives
+      add_method_tracer :article
+      add_method_tracer :/
+      add_method_tracer :go
+    end
+
     class Context
       include Template
+      if defined? NewRelic
+        include NewRelic::Agent::MethodTracer
+        add_method_tracer :to_html, 'Custom/#{self.class.name}/to_html/#{args.first}'
+      end
       attr_reader :env
 
       def initialize ctx = {}, config = {}, path = "/", env = {}
@@ -164,6 +225,10 @@ module Toto
         ctx.each do |k, v|
           meta_def(k) { ctx.instance_of?(Hash) ? v : ctx.send(k) }
         end
+      end
+
+      def tag_list
+        @tag_list ||= Site.tag_list(@config[:ext])
       end
 
       def title
@@ -189,6 +254,10 @@ module Toto
 
   class Repo < Hash
     include Template
+    if defined? NewRelic
+      include NewRelic::Agent::MethodTracer
+      add_method_tracer :to_html, 'Custom/#{self.class.name}/to_html/#{args.first}'
+    end
 
     README = "https://github.com/%s/%s/raw/master/README.%s"
 
@@ -207,6 +276,10 @@ module Toto
 
   class Archives < Array
     include Template
+    if defined? NewRelic
+      include NewRelic::Agent::MethodTracer
+      add_method_tracer :to_html, 'Custom/#{self.class.name}/to_html/#{args.first}'
+    end
 
     def initialize articles, config
       self.replace articles
@@ -226,6 +299,10 @@ module Toto
 
   class Article < Hash
     include Template
+    if defined? NewRelic
+      include NewRelic::Agent::MethodTracer
+      add_method_tracer :to_html, 'Custom/#{self.class.name}/to_html/#{args.first}'
+    end
 
     def initialize obj, config = {}
       @obj, @config = obj, config
@@ -236,7 +313,7 @@ module Toto
       data = if @obj.is_a? String
         meta, self[:body] = File.read(@obj).split(/\n\n/, 2)
 
-        # use the date from the filename, or else toto won't find the article
+        # use the date from the filename, or else tinman won't find the article
         @obj =~ /\/(\d{4}-\d{2}-\d{2})[^\/]*$/
         ($1 ? {:date => $1} : {}).merge(YAML.load(meta))
       elsif @obj.is_a? Hash
@@ -281,6 +358,14 @@ module Toto
       "/#{@config[:prefix]}#{self[:date].strftime("/%Y/%m/%d/#{slug}/")}".squeeze('/')
     end
 
+    def tags
+      if self[:tags]
+        self[:tags].split(',').map(&:strip)
+      else
+        []
+      end
+    end
+
     def title()   self[:title] || "an article"               end
     def date()    @config[:date].call(self[:date])           end
     def author()  self[:author] || @config[:author]          end
@@ -306,7 +391,7 @@ module Toto
         ERB.new(File.read("#{path}/#{page}.rhtml")).result(ctx)
       },
       :error => lambda {|code|                              # The HTML for your error page
-        "<font style='font-size:300%'>toto, we're not in Kansas anymore (#{code})</font>"
+        "<font style='font-size:300%'>Lions, Tigers and Bears. Oh My! Something went wrong.(#{code})</font>"
       }
     }
     def initialize obj
@@ -325,11 +410,12 @@ module Toto
 
   class Server
     attr_reader :config, :site
+    include NewRelic::Agent::Instrumentation::ControllerInstrumentation if defined? NewRelic
 
     def initialize config = {}, &blk
       @config = config.is_a?(Config) ? config : Config.new(config)
       @config.instance_eval(&blk) if block_given?
-      @site = Toto::Site.new(@config)
+      @site = Glinda::Site.new(@config)
     end
 
     def call env
@@ -348,7 +434,7 @@ module Toto
       @response['Content-Type']   = Rack::Mime.mime_type(".#{response[:type]}")
 
       # Set http cache headers
-      @response['Cache-Control'] = if Toto.env == 'production'
+      @response['Cache-Control'] = if Glinda.env == 'production'
         "public, max-age=#{@config[:cache]}"
       else
         "no-cache, must-revalidate"
