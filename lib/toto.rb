@@ -164,6 +164,14 @@ module Toto
         @config[:title]
       end
 
+      def keywords
+        @config[:keywords]
+      end
+      
+      def description
+        @config[:description]
+      end
+
       def render page, type
         content = to_html page, @config
         type == :html ? to_html(:layout, @config, &Proc.new { content }) : send(:"to_#{type}", page)
@@ -275,10 +283,10 @@ module Toto
       "/#{@config[:prefix]}#{self[:date].strftime("/%Y/%m/%d/#{slug}/")}".squeeze('/')
     end
 
-    def title()   self[:title] || "an article"               end
-    def date()    @config[:date].call(self[:date])           end
-    def author()  self[:author] || @config[:author]          end
-    def to_html() self.load; super(:article, @config)        end
+    def title()   self[:title] || "an article"                    end
+    def date()    @config[:date].call(self[:date])                end
+    def author()  self[:author] || @config[:author]               end
+    def to_html() self.load; super(:article, @config)             end
     alias :to_s to_html
   end
 
@@ -286,6 +294,8 @@ module Toto
     Defaults = {
       :author => ENV['USER'],                               # blog author
       :title => Dir.pwd.split('/').last,                    # site title
+      :keywords => "",
+      :description => "",
       :root => "index",                                     # site index
       :url => "http://127.0.0.1",                           # root URL of the site
       :prefix => "",                                        # common path prefix for the blog
